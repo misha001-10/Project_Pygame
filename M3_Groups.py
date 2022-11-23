@@ -9,17 +9,21 @@ class Large_Sprite_Group():
         self.all_objects = Object_Sprite_Group(self)
         self.all_line_bullet = Line_Bullet_Group(self)
         self.all_animations = Animation_Group(self)
+        self.all_cursors = Cursor_Group(self)
 
     def add(self, sprite):
         if sprite.type == 0:
             self.all_objects.add(sprite)
         elif sprite.type == 1:
             self.all_line_bullet.add(sprite)
+        elif sprite.type == 'cursor':
+            self.all_cursors.add(sprite)
 
     def update(self, *args, **kwargs):
         self.all_objects.update(*args, **kwargs)
         self.all_line_bullet.update(*args, **kwargs)
         self.all_animations.update(*args, **kwargs)
+        self.all_cursors.update(*args, **kwargs)
 
     def calculation_relative_coordinates(self, *args, **kwargs):
         self.all_objects.calculation_relative_coordinates(*args, **kwargs)
@@ -36,6 +40,7 @@ class Large_Sprite_Group():
         self.all_objects.draw(screen)
         self.all_line_bullet.draw(screen)
         self.all_animations.draw(screen)
+        self.all_cursors.draw(screen)
 
 
 class Object_Sprite_Group(pygame.sprite.Group):
@@ -56,7 +61,7 @@ class Object_Sprite_Group(pygame.sprite.Group):
         for sprite in self.sprites():
             new_sprits = sprite.action(*args, **kwargs)
             if new_sprits:
-                self.parent.all_line_bullet.add(new_sprits)
+                self.parent.add(new_sprits)
 
     def calculation_relative_coordinates(self, *args, **kwargs):
         for sprite in self.sprites():
@@ -128,3 +133,9 @@ class Animation_Group(pygame.sprite.Group):
     def draw(self, surface: pygame.Surface) -> None:
         for i in self.sprites():
             i.draw(surface)
+
+
+class Cursor_Group(pygame.sprite.Group):
+    def __init__(self, parent):
+        super(Cursor_Group, self).__init__()
+        self.parent = parent

@@ -4,13 +4,24 @@ import M1_Objects
 
 
 class Player(M1_Objects.Object):
-    def __init__(self, type, img, cord=[720, 480], angle=0, health=1500, weight=10, speed=[0, 0], angle_speed=0, max_angle_speed=4, speed_boost=0.1):
-        super(Player, self).__init__(type, img, cord, angle, health, weight, speed, angle_speed, max_angle_speed)
+    def __init__(self, img, cord=[720, 480], angle=0, health=1500, weight=10, speed=[0, 0], angle_speed=0, max_angle_speed=4, speed_boost=0.1):
+        super(Player, self).__init__(img, cord, angle, health, weight, speed, angle_speed, max_angle_speed)
         self.speed_boost = speed_boost
 
     def update_player(self, position):
         keystate = pygame.key.get_pressed()
         new_angle = None
+        if pygame.mouse.get_focused():
+            x, y = pygame.mouse.get_pos()
+            x_sr = x - self.rect.centerx
+            y_sr = y - self.rect.centery
+            new_angle = 180 + math.atan2(x_sr, y_sr) * 180 / math.pi + 90
+            if new_angle < 0:
+                new_angle = 360 - new_angle
+            elif new_angle > 360:
+                # print(self.angle)
+                new_angle = 0 + (new_angle - 360)
+            print(new_angle)
         if keystate[pygame.K_d]:
             new_angle = 0
         if keystate[pygame.K_a]:
@@ -75,5 +86,5 @@ class Player(M1_Objects.Object):
 
     def action(self, *args, **kwargs):
         keystate = pygame.key.get_pressed()
-        if keystate[pygame.K_f]:
-            return M1_Objects.Bullet_Line(*args, self.cord, self.angle,  self)
+        if pygame.mouse.get_pressed()[0]:
+            return M1_Objects.Bullet_Line(self.cord, self.angle,  self)

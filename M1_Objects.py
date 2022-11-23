@@ -4,7 +4,7 @@ import random
 
 
 class Object(pygame.sprite.Sprite):
-    def __init__(self, type, img: pygame.Surface, cord, angle=0, health=1500, weight=10, speed=[0, 0], angle_speed=-1,
+    def __init__(self, img: pygame.Surface, cord, angle=0, health=1500, weight=10, speed=[0, 0], angle_speed=-1,
                  max_angle_speed=0):
         pygame.sprite.Sprite.__init__(self)
         self.img = img
@@ -13,7 +13,7 @@ class Object(pygame.sprite.Sprite):
         self.angle_speed = angle_speed
         self.cord = cord
         self.max_angle_speed = max_angle_speed
-        self.type = type
+        self.type = 0
         print(self.img)
         self.width, self.height = self.img.get_width(), self.img.get_height()
         self.image = pygame.transform.rotate(self.img, self.angle)
@@ -49,12 +49,13 @@ class Object(pygame.sprite.Sprite):
 
 
 class Bullet_Line(pygame.sprite.Sprite):
-    def __init__(self, position, cord, angle, parent):
+    def __init__(self, cord, angle, parent):
         super(Bullet_Line, self).__init__()
+        self.type = 1
         self.cord = cord.copy()
         self.cord = random.randint(int(self.cord[0]) - 5, int(self.cord[0]) + 5), random.randint(int(self.cord[1]) - 5,
                                                                                                  int(self.cord[1]) + 5)
-        self.angle = random.randint(angle - 10, angle + 10)
+        self.angle = random.randint(int(angle) - 10, int(angle + 10))
         self.end_cord = [self.cord[0] + 700 * math.cos(self.angle * math.pi / 180),
                          self.cord[1] + 700 * math.sin(-self.angle * math.pi / 180)]
         self.rect_cord = cord.copy()
@@ -82,15 +83,6 @@ class Bullet_Line(pygame.sprite.Sprite):
         #k1 = ((self.end_cord[1] - self.cord[1]) / (
         #        self.end_cord[0] - self.cord[0])) if self.end_cord[0] != self.cord[0] else 1000000000
         #b1 = self.cord[1] - (k1 * self.cord[0])
-#
-        #k2 = 0
-        #b2 = 200
-        ## print(k1, b1 ,k2, b2)
-#
-        #x = ((b2 - b1) / (k1 - k2)) if k1 != k2 else False
-        #if x:
-        #    y = k2 * x + b2
-        #    pygame.draw.circle(surface, (255, 255, 255), (x, y), 5)
 
 
 class Animation(pygame.sprite.Sprite):
@@ -105,3 +97,19 @@ class Animation(pygame.sprite.Sprite):
     def draw(self, surface):
         #print(self.rect_cord)
         pygame.draw.circle(surface, (255, 255, 255), self.rect_cord, 5)
+
+
+class Cursor(pygame.sprite.Sprite):
+    def __init__(self, img):
+        super(Cursor, self).__init__()
+        self.type = 'cursor'
+        self.img = img
+        self.image = self.img
+        self.image.set_colorkey((255, 255, 255))
+        self.rect = self.image.get_rect()
+
+    def update(self):
+        if pygame.mouse.get_focused():
+            self.rect.center = pygame.mouse.get_pos()
+        else:
+            self.rect.center = (-20, -20)
