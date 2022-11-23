@@ -35,9 +35,10 @@ while r:
             r = False
 
     position = player.update_player(position)
-    all_sprits.update(position)
+    all_sprits.update()
     all_sprits.action(position)
     all_sprits.collide()
+    all_sprits.calculation_relative_coordinates(position)
     #print(position)
 
     screen.fill((0, 0, 35))

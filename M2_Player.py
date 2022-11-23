@@ -30,6 +30,8 @@ class Player(M1_Objects.Object):
         if keystate[pygame.K_SPACE]:
             self.speed = [self.speed[0] + self.speed_boost * math.cos(self.angle * math.pi / 180),
                           self.speed[1] + self.speed_boost * math.sin(-self.angle * math.pi / 180)]
+        if keystate[pygame.K_LSHIFT]:
+            self.speed = [0, 0]
             #print(self.speed)
         if not (new_angle is None):
             if abs(self.angle - new_angle) > self.max_angle_speed:
@@ -68,7 +70,7 @@ class Player(M1_Objects.Object):
         self.rect.center = [720, 480]
         return position
 
-    def update(self, position) -> None:
+    def update(self, *args, **kwargs) -> None:
         pass
 
     def action(self, *args, **kwargs):
