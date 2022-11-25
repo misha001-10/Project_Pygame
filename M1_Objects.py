@@ -14,7 +14,7 @@ class Object(pygame.sprite.Sprite):
         self.cord = cord
         self.max_angle_speed = max_angle_speed
         self.type = 0
-        print(self.img)
+        #print(self.img)
         self.width, self.height = self.img.get_width(), self.img.get_height()
         self.image = pygame.transform.rotate(self.img, self.angle)
         self.image.set_colorkey((255, 255, 255))
@@ -49,27 +49,28 @@ class Object(pygame.sprite.Sprite):
 
 
 class Bullet_Line(pygame.sprite.Sprite):
-    def __init__(self, cord, angle, parent):
+    def __init__(self, cord, angle, parent, accuracy, radius_of_defeat, damage):
         super(Bullet_Line, self).__init__()
         self.type = 1
         self.cord = cord.copy()
-        self.cord = random.randint(int(self.cord[0]) - 5, int(self.cord[0]) + 5), random.randint(int(self.cord[1]) - 5,
+        self.cord = random.randint(int(self.cord[0] - accuracy), int(self.cord[0] + accuracy)), random.randint(int(self.cord[1]) - 5,
                                                                                                  int(self.cord[1]) + 5)
-        self.angle = random.randint(int(angle) - 10, int(angle + 10))
-        self.end_cord = [self.cord[0] + 700 * math.cos(self.angle * math.pi / 180),
-                         self.cord[1] + 700 * math.sin(-self.angle * math.pi / 180)]
+        self.angle = random.randint(int(angle - accuracy), int(angle + accuracy))
+        self.end_cord = [self.cord[0] + radius_of_defeat * math.cos(self.angle * math.pi / 180),
+                         self.cord[1] + radius_of_defeat * math.sin(-self.angle * math.pi / 180)]
         self.rect_cord = cord.copy()
         self.end_rect_cord = self.end_cord.copy()
         self.parent = parent
         self.color = (255, 255, 255)
         self.color_end = self.color
         self.life = 0
+        self.damage = damage
 
     def update(self):
         self.life += 1
-        if self.life == 8:
+        if self.life == 25:
             self.kill()
-        self.color_end = self.color[0] - 28 * self.life, self.color[1] - 28 * self.life, self.color[2] - 28 * self.life
+        self.color_end = self.color[0] - 10 * self.life, self.color[1] - 10 * self.life, self.color[2] - 10 * self.life
 
     def calculation_relative_coordinates(self, position):
         self.rect_cord = self.cord[0] + position[0], self.cord[1] + position[1]
@@ -104,12 +105,21 @@ class Cursor(pygame.sprite.Sprite):
         super(Cursor, self).__init__()
         self.type = 'cursor'
         self.img = img
-        self.image = self.img
+        self.image = self.img[0]
         self.image.set_colorkey((255, 255, 255))
         self.rect = self.image.get_rect()
+        self.button_event = [0, 0, 0]
 
     def update(self):
         if pygame.mouse.get_focused():
             self.rect.center = pygame.mouse.get_pos()
+            if self.button_event != pygame.mouse.get_pressed():
+                if pygame.mouse.get_pressed()[0]:
+                    self.image = self.img[1]
+                    self.image.set_colorkey((255, 255, 255))
+                else:
+                    self.image = self.img[0]
+                    self.image.set_colorkey((255, 255, 255))
+            self.button_event = pygame.mouse.get_pressed()
         else:
             self.rect.center = (-20, -20)

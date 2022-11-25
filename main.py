@@ -20,9 +20,15 @@ clock = pygame.time.Clock()
 
 p_img = pygame.image.load(path.join(img_dir, 'plain.png')).convert(screen)
 astr_img = pygame.image.load(path.join(img_dir, 'asteroid_64x64_1.png')).convert(screen)
-c_img = pygame.image.load(path.join(img_dir, 'cursor.png')).convert(screen)
+c_img = [pygame.image.load(path.join(img_dir, 'cursor_norm.png')).convert(screen),
+         pygame.image.load(path.join(img_dir, 'cursor_left.png')).convert(screen)]
 
 all_sprits = M3_Groups.Large_Sprite_Group()
+#for i in range(15):
+objekt = M1_Objects.Object(astr_img, [0, 210], 0)
+all_sprits.add(objekt)
+objekt = M1_Objects.Object(astr_img, [210, 0], 0)
+all_sprits.add(objekt)
 objekt = M1_Objects.Object(astr_img, [0, 0], 0)
 all_sprits.add(objekt)
 player = M2_Player.Player(p_img)

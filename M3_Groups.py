@@ -108,7 +108,7 @@ class Line_Bullet_Group(pygame.sprite.Group):
                             i.end_cord = min([i for i in len_line_point.keys() if i], key=lambda x: len_line_point[x])
                             purpose = j
                 if purpose:
-                    purpose.health -= 10
+                    purpose.health -= i.damage
                             #print(i.end_cord)
                             #if points[0]:
                             #    self.parent.all_animations.add(M1_Objects.Animation(points[0]))

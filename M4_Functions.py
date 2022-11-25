@@ -38,7 +38,7 @@ def collide_line_rect(line, rect):
             line.end_cord[1] - line.cord[1])) if line.end_cord[1] != line.cord[1] else 1000000000
     b1 = line.cord[0] - (k1 * line.cord[1])
     k2 = 0
-    b2 = rect.cord[1] - (rect.height / 2)
+    b2 = rect.cord[0] - (rect.width / 2)
     y = (((b2 - b1) / (k1 - k2)) if k1 != k2 else False) if abs(k1 - k2) >= 10 ** -6 else False
     if y:
         x = k2 * y + b2
@@ -49,7 +49,7 @@ def collide_line_rect(line, rect):
             points[2] = (x, y)
 
     k2 = 0
-    b2 = rect.cord[1] + (rect.height / 2)
+    b2 = rect.cord[0] + (rect.width / 2)
     y = (((b2 - b1) / (k1 - k2)) if k1 != k2 else False) if abs(k1 - k2) >= 10 ** -6 else False
     if y:
         x = k2 * y + b2

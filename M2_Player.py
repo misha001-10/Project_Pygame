@@ -7,6 +7,7 @@ class Player(M1_Objects.Object):
     def __init__(self, img, cord=[720, 480], angle=0, health=1500, weight=10, speed=[0, 0], angle_speed=0, max_angle_speed=4, speed_boost=0.1):
         super(Player, self).__init__(img, cord, angle, health, weight, speed, angle_speed, max_angle_speed)
         self.speed_boost = speed_boost
+        self.gan = Line_Bullet_Gan_Gatling(self, [50, 60, 600, 5], 15, 700, [3, 6])
 
     def update_player(self, position):
         keystate = pygame.key.get_pressed()
@@ -21,7 +22,7 @@ class Player(M1_Objects.Object):
             elif new_angle > 360:
                 # print(self.angle)
                 new_angle = 0 + (new_angle - 360)
-            print(new_angle)
+            #print(new_angle)
         if keystate[pygame.K_d]:
             new_angle = 0
         if keystate[pygame.K_a]:
@@ -85,6 +86,64 @@ class Player(M1_Objects.Object):
         pass
 
     def action(self, *args, **kwargs):
-        keystate = pygame.key.get_pressed()
+        return self.gan.shooting()
+
+
+class Line_Bullet_Gan_Standard:
+    def __init__(self, parent, damage, radius_of_defeat, accuracy):
+        self.parent = parent
+        self.damage = damage
+        self.range = radius_of_defeat
+        self.accuracy = accuracy
+
+    def shooting(self):
         if pygame.mouse.get_pressed()[0]:
-            return M1_Objects.Bullet_Line(self.cord, self.angle,  self)
+            return M1_Objects.Bullet_Line(self.parent.cord, self.parent.angle, self.parent, self.accuracy, self.range, self.damage)
+
+
+class Line_Bullet_Gan_Automat(Line_Bullet_Gan_Standard):
+    def __init__(self, parent, rate_of_fire, queue, recharge_time, damage, radius_of_defeat, accuracy):
+        super(Line_Bullet_Gan_Automat, self).__init__(parent, damage, radius_of_defeat, accuracy)
+        self.rate_of_fire = rate_of_fire
+        self.queue = queue
+        self.recharge_time = recharge_time
+        self.time = 0
+        self.queue_now = [0, 0]
+
+    def shooting(self):
+        print(pygame.time.get_ticks() - self.queue_now[1])
+        if self.queue_now[0] >= self.queue[0]:
+            if pygame.time.get_ticks() - self.queue_now[1] > self.queue[1]:
+                self.queue_now[0] = 0
+            return None
+        self.queue_now[1] = pygame.time.get_ticks()
+        if not self.queue or self.queue_now[0] < self.queue[0]:
+            if pygame.mouse.get_pressed()[0]:
+                if pygame.time.get_ticks() - self.time >= self.rate_of_fire:
+                    self.time = pygame.time.get_ticks()
+                    self.queue_now[0] += 1
+                    return M1_Objects.Bullet_Line(self.parent.cord, self.parent.angle, self.parent, self.accuracy,
+                                                  self.range, self.damage)
+
+
+class Line_Bullet_Gan_Gatling(Line_Bullet_Gan_Standard):
+    def __init__(self, parent, rate_of_fire, damage, radius_of_defeat, accuracy):
+        super(Line_Bullet_Gan_Gatling, self).__init__(parent, damage, radius_of_defeat, accuracy)
+        self.rate_of_fire = rate_of_fire
+        self.time = 0
+        self.speed = rate_of_fire[1]
+
+    def shooting(self):
+        accuracy = self.accuracy[0] + ((self.accuracy[1] - self.accuracy[0]) * (self.speed - self.rate_of_fire[1]) / (self.rate_of_fire[2] - self.rate_of_fire[1] - self.rate_of_fire[1]))
+        #print(self.accuracy[1], self.speed - self.rate_of_fire[1], self.rate_of_fire[2] - self.rate_of_fire[1] - self.rate_of_fire[1], accuracy)
+        if pygame.mouse.get_pressed()[0]:
+            if self.speed < self.rate_of_fire[2] - self.rate_of_fire[1]:
+                self.speed += self.rate_of_fire[3]
+            if self.speed >= self.rate_of_fire[0] + self.rate_of_fire[1]:
+                if pygame.time.get_ticks() - self.time >= self.rate_of_fire[2] - self.speed:
+                    self.time = pygame.time.get_ticks()
+                    return M1_Objects.Bullet_Line(self.parent.cord, self.parent.angle, self.parent, accuracy,
+                                                  self.range, self.damage)
+        else:
+            if self.speed > self.rate_of_fire[1]:
+                self.speed -= self.rate_of_fire[3]
