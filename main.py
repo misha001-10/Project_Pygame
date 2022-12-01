@@ -23,7 +23,7 @@ astr_img = pygame.image.load(path.join(img_dir, 'asteroid_64x64_1.png')).convert
 c_img = [pygame.image.load(path.join(img_dir, 'cursor_norm.png')).convert(screen),
          pygame.image.load(path.join(img_dir, 'cursor_left.png')).convert(screen)]
 
-all_sprits = M3_Groups.Large_Sprite_Group()
+all_sprits = M3_Groups.Large_Sprite_Group(p_img)
 #for i in range(15):
 objekt = M1_Objects.Object(astr_img, [0, 210], 0)
 all_sprits.add(objekt)
@@ -31,8 +31,6 @@ objekt = M1_Objects.Object(astr_img, [210, 0], 0)
 all_sprits.add(objekt)
 objekt = M1_Objects.Object(astr_img, [0, 0], 0)
 all_sprits.add(objekt)
-player = M2_Player.Player(p_img)
-all_sprits.add(player)
 cur = M1_Objects.Cursor(c_img)
 all_sprits.add(cur)
 
@@ -46,7 +44,7 @@ while r:
         if event.type == pygame.QUIT:
             r = False
 
-    position = player.update_player(position)
+    position = all_sprits.player.update_player(position)
     all_sprits.update()
     all_sprits.action()
     all_sprits.collide()

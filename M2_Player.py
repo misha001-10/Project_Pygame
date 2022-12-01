@@ -1,10 +1,12 @@
 import pygame
 import math
 import M1_Objects
+import random
 
 
 class Player(M1_Objects.Object):
     def __init__(self, img, cord=[720, 480], angle=0, health=1500, weight=10, speed=[0, 0], angle_speed=0, max_angle_speed=4, speed_boost=0.1):
+        self.id = '002' + '.' + str(random.randint(9999999, 100000000))
         super(Player, self).__init__(img, cord, angle, health, weight, speed, angle_speed, max_angle_speed)
         self.speed_boost = speed_boost
         self.gan = Line_Bullet_Gan_Gatling(self, [50, 60, 600, 5], 15, 700, [3, 6])

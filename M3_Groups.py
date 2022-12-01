@@ -1,28 +1,40 @@
 import pygame
 import M1_Objects
 import M4_Functions
+import M2_Player
+from M5_Network import Network
 from pprint import pprint
 
 
 class Large_Sprite_Group():
-    def __init__(self):
+    def __init__(self, p_img):
         self.all_objects = Object_Sprite_Group(self)
         self.all_line_bullet = Line_Bullet_Group(self)
-        self.all_animations = Animation_Group(self)
+        #self.all_animations = Animation_Group(self)
         self.all_cursors = Cursor_Group(self)
+        self.player = M2_Player.Player(p_img)
+        self.add(self.player)
+        self.net = Network()
 
     def add(self, sprite):
-        if sprite.type == 0:
-            self.all_objects.add(sprite)
-        elif sprite.type == 1:
-            self.all_line_bullet.add(sprite)
-        elif sprite.type == 'cursor':
-            self.all_cursors.add(sprite)
+        if hasattr(sprite, 'type'):
+            if sprite.type == 0:
+                self.all_objects.add(sprite)
+            elif sprite.type == 1:
+                self.all_line_bullet.add(sprite)
+            elif sprite.type == 'cursor':
+                self.all_cursors.add(sprite)
 
     def update(self, *args, **kwargs):
-        self.all_objects.update(*args, **kwargs)
+        #print(self.player.id)
+        #print(self.net.id + ';;' + self.player.id + ':' + '.'.join([str(i) for i in self.player.cord]) + ':' + '150')
+        #print(self.net.id + ';;' + self.player.id + ':' + '.'.join([str(i) for i in self.player.cord]) + ':' + '150')
+        res = self.net.send(self.net.id + ';;' + self.player.id + ':' + '.'.join([str(i) for i in self.player.cord]) + ':' + '150')
+        pprint(res.split(';'))
+        #print(res)
+        #self.all_objects.update(*args, **kwargs)
         self.all_line_bullet.update(*args, **kwargs)
-        self.all_animations.update(*args, **kwargs)
+        #self.all_animations.update(*args, **kwargs)
         self.all_cursors.update(*args, **kwargs)
 
     def calculation_relative_coordinates(self, *args, **kwargs):
@@ -30,7 +42,7 @@ class Large_Sprite_Group():
         self.all_line_bullet.calculation_relative_coordinates(*args, **kwargs)
 
     def action(self, *args, **kwargs):
-        self.all_objects.action(*args, **kwargs)
+        self.add(self.player.action(*args, **kwargs))
 
     def collide(self):
         self.all_objects.collide()
@@ -39,7 +51,7 @@ class Large_Sprite_Group():
     def draw(self, screen):
         self.all_objects.draw(screen)
         self.all_line_bullet.draw(screen)
-        self.all_animations.draw(screen)
+        #self.all_animations.draw(screen)
         self.all_cursors.draw(screen)
 
 
@@ -56,6 +68,7 @@ class Object_Sprite_Group(pygame.sprite.Group):
                 if hits:
                     sprite.kill()
                     sprite1.kill()
+                    return False
 
     def action(self, *args, **kwargs):
         for sprite in self.sprites():

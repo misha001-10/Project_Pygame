@@ -50,6 +50,7 @@ class Object(pygame.sprite.Sprite):
 
 class Bullet_Line(pygame.sprite.Sprite):
     def __init__(self, cord, angle, parent, accuracy, radius_of_defeat, damage):
+        self.id = random.randint(0, 1000000000000)
         super(Bullet_Line, self).__init__()
         self.type = 1
         self.cord = cord.copy()
