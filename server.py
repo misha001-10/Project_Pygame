@@ -70,15 +70,20 @@ def threaded_client(conn):
     conn.close()
 
 def server_processing():
+    global pos
     clock = pygame.time.Clock()
-    net = Network()
+    #net = Network()
     asteroid = ['001' + '.' + str(random.randint(9999999, 100000000)) + ':' + '10.10' + ':' + '1500',
                 '001' + '.' + str(random.randint(9999999, 100000000)) + ':' + '120.120' + ':' + '1500']
     print(asteroid)
     while True:
         clock.tick(60)
-        print(clock.get_fps())
-        net.send(net.id + ';;' + ';'.join(asteroid))
+        for i in asteroid:
+            reply_inf_splited = i.split(':')
+            keys[reply_inf_splited[0]] = i
+        #clock.tick(60)
+        #print(clock.get_fps())
+        #net.send(net.id + ';;' + ';'.join(asteroid))
 
 th = Thread(target=server_processing, args=())
 th.start()
