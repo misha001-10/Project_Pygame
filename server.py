@@ -5,6 +5,7 @@ from M5_Network import Network
 from threading import Thread
 import random
 import sys
+import S1_Server_Objekts
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -23,8 +24,13 @@ s.listen(2)
 print("Waiting for a connection")
 
 currentId = "0"
+
 pos = ["0:50,50", "1:100,100"]
 keys = {}
+line_bullet = []
+all_objekts = pygame.sprite.Group()
+
+
 def threaded_client(conn):
     global currentId, pos
     conn.send(str.encode(currentId))
@@ -47,8 +53,16 @@ def threaded_client(conn):
                 reply_inf = arr[1].split(';')
                 for i in reply_inf:
                     reply_inf_splited = i.split(':')
+                    if reply_inf_splited[0] in keys.keys():
+                        for j in all_objekts:
+                            if j.id == reply_inf_splited[0]:
+                                j.receiving(reply_inf_splited[1].split('.') + [64, 64])
+                                break
+                        else:
+                            all_objekts.add(S1_Server_Objekts.Server_colide_objekt(reply_inf_splited[0], reply_inf_splited[1].split('.') + [64, 64]))
                     keys[reply_inf_splited[0]] = i
                 print(keys)
+                print(arr[2])
                 id = int(arr[0])
                 pos[id] = reply
 
@@ -69,18 +83,26 @@ def threaded_client(conn):
     print("Connection Closed")
     conn.close()
 
+
 def server_processing():
-    global pos
+    global pos, all_objekts
     clock = pygame.time.Clock()
     #net = Network()
-    asteroid = ['001' + '.' + str(random.randint(9999999, 100000000)) + ':' + '10.10' + ':' + '1500',
-                '001' + '.' + str(random.randint(9999999, 100000000)) + ':' + '120.120' + ':' + '1500']
-    print(asteroid)
+    all_objekts.add(S1_Server_Objekts.Server_Objekt([10, 10, 64, 64], health=1500, angle_speed=random.randint(-200, 200) / 100))
+    all_objekts.add(S1_Server_Objekts.Server_Objekt([120, 120, 64, 64], health=1500, angle_speed=random.randint(-200, 200) / 100))
+    all_objekts.add(S1_Server_Objekts.Server_Objekt([520, 520, 64, 64], health=1500, angle_speed=random.randint(-200, 200) / 100))
+
+    #asteroid = ['001' + '.' + str(random.randint(9999999, 100000000)) + ':' + '10.10' + ':' + '1500',
+    #            '001' + '.' + str(random.randint(9999999, 100000000)) + ':' + '120.120' + ':' + '1500',
+    #            '001' + '.' + str(random.randint(9999999, 100000000)) + ':' + '520.360' + ':' + '1500']
+    #print(asteroid)
     while True:
+        #print(list(all_objekts))
         clock.tick(60)
-        for i in asteroid:
-            reply_inf_splited = i.split(':')
-            keys[reply_inf_splited[0]] = i
+        for i in all_objekts:
+            if i.updating:
+                keys[i.id] = i.id + ':' + '.'.join([str(j) for j in i.cord]) + ':' + str(i.angle) + ':' + str(i.health)
+        all_objekts.update()
         #clock.tick(60)
         #print(clock.get_fps())
         #net.send(net.id + ';;' + ';'.join(asteroid))

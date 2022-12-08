@@ -28,6 +28,7 @@ position = [0, 0]
 r = True
 while r:
     clock.tick(M6_Constants.FPS)
+    #print(clock.get_fps())
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             r = False

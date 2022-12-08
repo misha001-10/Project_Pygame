@@ -13,6 +13,7 @@ class Large_Sprite_Group():
         self.all_line_bullet = Line_Bullet_Group(self)
         #self.all_animations = Animation_Group(self)
         self.all_cursors = Cursor_Group(self)
+        self.new_line_bullets = []
         self.player = M2_Player.Player(p_img)
         self.add(self.player)
         self.net = Network()
@@ -26,21 +27,21 @@ class Large_Sprite_Group():
             elif sprite.type == 'cursor':
                 self.all_cursors.add(sprite)
 
-
     def add_net(self, objekt):
         objekt_splited = objekt.split(':')
-        if objekt_splited[0].split('.')[0] == '002':
+        #print(float(objekt_splited[2]))
+        if objekt_splited[0].split('.')[0] == '0201':
             if objekt_splited[0].split('.')[1] == self.player.id:
                 return
-        elif objekt_splited[0].split('.')[0] == '001':
-            self.all_objects.add(M1_Objects.Object(M6_Constants.IMG['astr_img'], [int(i) for i in objekt_splited[1].split('.')]))
+        elif objekt_splited[0].split('.')[0] == '0101':
+            self.all_objects.add(M1_Objects.Object(M6_Constants.IMG['astr_img'], [int(i) for i in objekt_splited[1].split('.')], angle=float(objekt_splited[2])))
         #print([int(i) for i in objekt_splited[1].split('.')])
 
     def update(self, *args, **kwargs):
         #print(self.player.id)
         #print(self.net.id + ';;' + self.player.id + ':' + '.'.join([str(i) for i in self.player.cord]) + ':' + '150')
         #print(self.net.id + ';;' + self.player.id + ':' + '.'.join([str(i) for i in self.player.cord]) + ':' + '150')
-        res = self.net.send(self.net.id + ';;' + self.player.id + ':' + '.'.join([str(i) for i in self.player.cord]) + ':' + '150')
+        res = self.net.send(self.net.id + ';;' + self.player.id + ':' + '.'.join([str(i) for i in self.player.cord]) + ':' + '150' + ';;' + ';'.join(self.new_line_bullets))
         #pprint(res.split(';'))
         self.all_objects.empty()
         for i in res.split(';'):
@@ -62,7 +63,7 @@ class Large_Sprite_Group():
 
     def collide(self):
         self.all_objects.collide()
-        self.all_line_bullet.collide_objekts(self.all_objects)
+        #self.all_line_bullet.collide_objekts(self.all_objects)
 
     def draw(self, screen):
         self.all_objects.draw(screen)

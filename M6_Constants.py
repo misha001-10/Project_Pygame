@@ -2,8 +2,8 @@ import pygame
 from os import path
 
 
-W = 1440
-H = 960
+W = 1920
+H = 1080
 FPS = 60
 
 B = (255, 255, 255)

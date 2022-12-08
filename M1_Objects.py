@@ -4,7 +4,7 @@ import random
 
 
 class Object(pygame.sprite.Sprite):
-    def __init__(self, img: pygame.Surface, cord, angle=0, health=1500, weight=10, speed=[0, 0], angle_speed=-1,
+    def __init__(self, img: pygame.Surface, cord, angle=0, health=1500, speed=[0, 0], angle_speed=0,
                  max_angle_speed=0):
         pygame.sprite.Sprite.__init__(self)
         self.img = img
@@ -21,7 +21,6 @@ class Object(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = self.cord
         self.health = health
-        self.weight = weight
 
     def update(self) -> None:
         if self.health <= 0:
