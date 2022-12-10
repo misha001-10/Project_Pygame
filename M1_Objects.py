@@ -48,23 +48,15 @@ class Object(pygame.sprite.Sprite):
 
 
 class Bullet_Line(pygame.sprite.Sprite):
-    def __init__(self, cord, angle, parent, accuracy, radius_of_defeat, damage):
-        self.id = random.randint(0, 1000000000000)
+    def __init__(self, id, cord, end_cord):
         super(Bullet_Line, self).__init__()
-        self.type = 1
         self.cord = cord.copy()
-        self.cord = random.randint(int(self.cord[0] - accuracy), int(self.cord[0] + accuracy)), random.randint(int(self.cord[1]) - 5,
-                                                                                                 int(self.cord[1]) + 5)
-        self.angle = random.randint(int(angle - accuracy), int(angle + accuracy))
-        self.end_cord = [self.cord[0] + radius_of_defeat * math.cos(self.angle * math.pi / 180),
-                         self.cord[1] + radius_of_defeat * math.sin(-self.angle * math.pi / 180)]
+        self.end_cord = end_cord.copy()
         self.rect_cord = cord.copy()
         self.end_rect_cord = self.end_cord.copy()
-        self.parent = parent
         self.color = (255, 255, 255)
         self.color_end = self.color
         self.life = 0
-        self.damage = damage
 
     def update(self):
         self.life += 1

@@ -11,6 +11,7 @@ class Large_Sprite_Group():
     def __init__(self, p_img):
         self.all_objects = Object_Sprite_Group(self)
         self.all_line_bullet = Line_Bullet_Group(self)
+        self.list_peinted_line_bullet = {}
         #self.all_animations = Animation_Group(self)
         self.all_cursors = Cursor_Group(self)
         self.new_line_bullets = []
@@ -37,16 +38,32 @@ class Large_Sprite_Group():
             self.all_objects.add(M1_Objects.Object(M6_Constants.IMG['astr_img'], [int(i) for i in objekt_splited[1].split('.')], angle=float(objekt_splited[2])))
         #print([int(i) for i in objekt_splited[1].split('.')])
 
+    def add_bullet_net(self, bullet):
+        if bullet:
+            bullet_splited = bullet.split(':')
+            if bullet_splited[0] not in self.list_peinted_line_bullet.keys():
+                self.all_line_bullet.add(M1_Objects.Bullet_Line(bullet_splited[0], [float(i) for i in bullet_splited[1].split('..')], [float(i) for i in bullet_splited[2].split('..')]))
+                self.list_peinted_line_bullet[bullet_splited[0]] = pygame.time.get_ticks()
+
     def update(self, *args, **kwargs):
         #print(self.player.id)
         #print(self.net.id + ';;' + self.player.id + ':' + '.'.join([str(i) for i in self.player.cord]) + ':' + '150')
         #print(self.net.id + ';;' + self.player.id + ':' + '.'.join([str(i) for i in self.player.cord]) + ':' + '150')
-        res = self.net.send(self.net.id + ';;' + self.player.id + ':' + '.'.join([str(i) for i in self.player.cord]) + ':' + '150' + ';;' + ';'.join(self.new_line_bullets))
+        print('.'.join([str(int(i)) for i in self.player.cord]))
+        res = self.net.send(self.net.id + ';;' + self.player.id + ':' + '.'.join([str(int(i)) for i in self.player.cord]) + ':' + str(self.player.angle) + ';;' + ';'.join(self.new_line_bullets))
+        self.new_line_bullets = []
         #pprint(res.split(';'))
+        row_splited = res.split(';;')
         self.all_objects.empty()
-        for i in res.split(';'):
-            #print(i)
+        for i in row_splited[0].split(';'):
             self.add_net(i)
+        for i in row_splited[1].split(';'):
+            self.add_bullet_net(i)
+        now_list_peinted_line_bullet = {}
+        for i in self.list_peinted_line_bullet.items():
+            if i[1] + 200 > pygame.time.get_ticks():
+                now_list_peinted_line_bullet[i[0]] = i[1]
+        self.list_peinted_line_bullet = now_list_peinted_line_bullet
         self.add(self.player)
         #print(res)
         #self.all_objects.update(*args, **kwargs)
@@ -59,10 +76,14 @@ class Large_Sprite_Group():
         self.all_line_bullet.calculation_relative_coordinates(*args, **kwargs)
 
     def action(self, *args, **kwargs):
-        self.add(self.player.action(*args, **kwargs))
+        act = self.player.action(*args, **kwargs)
+        if act:
+            self.new_line_bullets += [act]
+        #print(self.new_line_bullets)
 
     def collide(self):
-        self.all_objects.collide()
+        pass
+        #self.all_objects.collide()
         #self.all_line_bullet.collide_objekts(self.all_objects)
 
     def draw(self, screen):

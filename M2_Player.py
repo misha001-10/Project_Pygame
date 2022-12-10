@@ -2,6 +2,7 @@ import pygame
 import math
 import M1_Objects
 import M6_Constants
+import M4_Functions
 import random
 
 
@@ -104,8 +105,9 @@ class Line_Bullet_Gan_Standard:
             return self.shoot()
 
     def shoot(self):
-        return M1_Objects.Bullet_Line(self.parent.cord, self.parent.angle, self.parent, self.accuracy, self.range,
-                                      self.damage)
+        #return M1_Objects.Bullet_Line(self.parent.cord, self.parent.angle, self.parent, self.accuracy, self.range,
+        #                              self.damage)
+        return M4_Functions.line_bullet_shoot(self.parent, self.accuracy, self.range, self.damage)
 
 
 class Line_Bullet_Gan_Automat(Line_Bullet_Gan_Standard):

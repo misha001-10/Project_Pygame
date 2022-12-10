@@ -6,6 +6,7 @@ from threading import Thread
 import random
 import sys
 import S1_Server_Objekts
+import S2_Server_Groups
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -27,12 +28,12 @@ currentId = "0"
 
 pos = ["0:50,50", "1:100,100"]
 keys = {}
-line_bullet = []
+line_bullet = S2_Server_Groups.Server_Line_Bullet_Group()
 all_objekts = pygame.sprite.Group()
 
 
 def threaded_client(conn):
-    global currentId, pos
+    global currentId, pos, line_bullet
     conn.send(str.encode(currentId))
     if currentId == '1':
         currentId = '2'
@@ -48,21 +49,27 @@ def threaded_client(conn):
                 break
             else:
                 #print('o')
-                print("Recieved: " + reply)
+                ##print("Recieved: " + reply)
                 arr = reply.split(";;")
                 reply_inf = arr[1].split(';')
+                bullet_inf = arr[2].split(';')
                 for i in reply_inf:
                     reply_inf_splited = i.split(':')
+                    #print(reply_inf_splited)
                     if reply_inf_splited[0] in keys.keys():
                         for j in all_objekts:
                             if j.id == reply_inf_splited[0]:
-                                j.receiving(reply_inf_splited[1].split('.') + [64, 64])
+                                j.receiving(reply_inf_splited[1].split('.') + [64, 64], reply_inf_splited[2])
                                 break
                         else:
-                            all_objekts.add(S1_Server_Objekts.Server_colide_objekt(reply_inf_splited[0], reply_inf_splited[1].split('.') + [64, 64]))
+                            all_objekts.add(S1_Server_Objekts.Server_colide_objekt(reply_inf_splited[0], reply_inf_splited[1].split('.') + [64, 64], reply_inf_splited[2]))
                     keys[reply_inf_splited[0]] = i
-                print(keys)
-                print(arr[2])
+                for i in bullet_inf:
+                    if i:
+                        bullet_inf_splited = i.split(':')
+                        line_bullet.add(S1_Server_Objekts.Server_line_bullet(*bullet_inf_splited))
+                ##print(keys)
+                ##print(arr[2])
                 id = int(arr[0])
                 pos[id] = reply
 
@@ -72,9 +79,9 @@ def threaded_client(conn):
                 #    nid = 0
 
                 #reply = pos[nid]
-                reply = ';'.join(keys.values())
-                print("Sending: " + reply)
-                print()
+                reply = ';'.join(keys.values()) + ';;' + line_bullet.str_transformation()
+                ##print("Sending: " + reply)
+                ##print()
 
             conn.sendall(str.encode(reply))
         except Exception as e:
@@ -85,7 +92,7 @@ def threaded_client(conn):
 
 
 def server_processing():
-    global pos, all_objekts
+    global pos, all_objekts, line_bullet, keys
     clock = pygame.time.Clock()
     #net = Network()
     all_objekts.add(S1_Server_Objekts.Server_Objekt([10, 10, 64, 64], health=1500, angle_speed=random.randint(-200, 200) / 100))
@@ -97,12 +104,19 @@ def server_processing():
     #            '001' + '.' + str(random.randint(9999999, 100000000)) + ':' + '520.360' + ':' + '1500']
     #print(asteroid)
     while True:
-        #print(list(all_objekts))
+        #print(line_bullet)
+        for i in line_bullet:
+            if i.time + 200 < pygame.time.get_ticks():
+                i.kill()
+        print(len(all_objekts), len(keys.keys()))
+        line_bullet.collide_objekts(all_objekts)
         clock.tick(60)
+        keys_now = {}
         for i in all_objekts:
-            if i.updating:
-                keys[i.id] = i.id + ':' + '.'.join([str(j) for j in i.cord]) + ':' + str(i.angle) + ':' + str(i.health)
+            keys_now[i.id] = i.id + ':' + '.'.join([str(j) for j in i.cord]) + ':' + str(i.angle) + ':' + str(i.health)
+        keys = keys_now
         all_objekts.update()
+        #print()
         #clock.tick(60)
         #print(clock.get_fps())
         #net.send(net.id + ';;' + ';'.join(asteroid))
