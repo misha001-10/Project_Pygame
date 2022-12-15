@@ -2,6 +2,22 @@ import pygame
 import M4_Functions
 
 
+class Server_Object_Group(pygame.sprite.Group):
+    def collide(self):
+        for sprite_namber in range(len(self.sprites())):
+            for sprite_namber1 in range(sprite_namber + 1, len(self.sprites())):
+                sprite, sprite1 = self.sprites()[sprite_namber], self.sprites()[sprite_namber1]
+                #hits = pygame.sprite.collide_mask(sprite, sprite1)
+                hits = 0
+                if sprite.cord[0] < sprite1.cord[0] + sprite1.rects[0] and sprite1.cord[0] < sprite.cord[0] + sprite.rects[0] and \
+                        sprite.cord[1] < sprite1.cord[1] + sprite1.rects[1] and sprite1.cord[1] < sprite.cord[1] + sprite.rects[1]:
+                    hits = 1
+                if hits:
+                    sprite.kill()
+                    sprite1.kill()
+                    return False
+
+
 class Server_Line_Bullet_Group(pygame.sprite.Group):
     def collide_objekts(self, group):
         for i in self.sprites():
@@ -51,7 +67,6 @@ class Server_Line_Bullet_Group(pygame.sprite.Group):
                                 #    self.parent.all_animations.add(M1_Objects.Animation(points[3]))
             except Exception:
                 pass
-
 
     def str_transformation(self):
         preparation_list = []

@@ -83,7 +83,8 @@ class Player(M1_Objects.Object):
         self.cord[1] += self.speed[1]
         position[0] -= self.speed[0]
         position[1] -= self.speed[1]
-        self.rect.center = [M6_Constants.W // 2, M6_Constants.H // 2]
+        #self.rect.center = [M6_Constants.W // 2, M6_Constants.H // 2]
+        #print(self.rect.center)
         return position
 
     def update(self, *args, **kwargs) -> None:
@@ -120,7 +121,7 @@ class Line_Bullet_Gan_Automat(Line_Bullet_Gan_Standard):
         self.queue_now = [0, 0]
 
     def shooting(self):
-        print(pygame.time.get_ticks() - self.queue_now[1])
+        #print(pygame.time.get_ticks() - self.queue_now[1])
         if self.queue_now[0] >= self.queue[0]:
             if pygame.time.get_ticks() - self.queue_now[1] > self.queue[1]:
                 self.queue_now[0] = 0

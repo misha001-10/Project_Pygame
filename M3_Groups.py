@@ -4,20 +4,30 @@ import M4_Functions
 import M2_Player
 import M6_Constants
 from M5_Network import Network
-from pprint import pprint
 
 
 class Large_Sprite_Group():
-    def __init__(self, p_img):
+    def __init__(self):
         self.all_objects = Object_Sprite_Group(self)
         self.all_line_bullet = Line_Bullet_Group(self)
         self.list_peinted_line_bullet = {}
         #self.all_animations = Animation_Group(self)
         self.all_cursors = Cursor_Group(self)
         self.new_line_bullets = []
-        self.player = M2_Player.Player(p_img)
-        self.add(self.player)
+        self.life = True
+        self.new_player()
         self.net = Network()
+
+    def new_player(self):
+        self.position = [0, 0]
+        self.respawn_flag = False
+        self.player = M2_Player.Player(M6_Constants.IMG['p_img'], [M6_Constants.W // 2, M6_Constants.H // 2])
+        self.add(self.player)
+        self.life = True
+
+    def respawn(self):
+        if not self.player:
+            self.respawn_flag = True
 
     def add(self, sprite):
         if hasattr(sprite, 'type'):
@@ -32,8 +42,9 @@ class Large_Sprite_Group():
         objekt_splited = objekt.split(':')
         #print(float(objekt_splited[2]))
         if objekt_splited[0].split('.')[0] == '0201':
-            if objekt_splited[0].split('.')[1] == self.player.id:
-                return
+            if self.player:
+                if objekt_splited[0].split('.')[1] == self.player.id:
+                    return
         elif objekt_splited[0].split('.')[0] == '0101':
             self.all_objects.add(M1_Objects.Object(M6_Constants.IMG['astr_img'], [int(i) for i in objekt_splited[1].split('.')], angle=float(objekt_splited[2])))
         #print([int(i) for i in objekt_splited[1].split('.')])
@@ -45,46 +56,52 @@ class Large_Sprite_Group():
                 self.all_line_bullet.add(M1_Objects.Bullet_Line(bullet_splited[0], [float(i) for i in bullet_splited[1].split('..')], [float(i) for i in bullet_splited[2].split('..')]))
                 self.list_peinted_line_bullet[bullet_splited[0]] = pygame.time.get_ticks()
 
+    def forming_player_inf(self):
+        if self.player:
+            return self.player.id + ':' + '.'.join([str(int(i)) for i in self.player.cord] + [str(self.player.width), str(self.player.height)]) + ':' + str(self.player.angle)
+        else:
+            if not self.respawn_flag:
+                return 'False'
+            else:
+                return 'True'
+
     def update(self, *args, **kwargs):
-        #print(self.player.id)
-        #print(self.net.id + ';;' + self.player.id + ':' + '.'.join([str(i) for i in self.player.cord]) + ':' + '150')
-        #print(self.net.id + ';;' + self.player.id + ':' + '.'.join([str(i) for i in self.player.cord]) + ':' + '150')
-        print('.'.join([str(int(i)) for i in self.player.cord]))
-        res = self.net.send(self.net.id + ';;' + self.player.id + ':' + '.'.join([str(int(i)) for i in self.player.cord]) + ':' + str(self.player.angle) + ';;' + ';'.join(self.new_line_bullets))
+        #print(self.net.id + ';;' + self.forming_player_inf() + ';;' + ';'.join(self.new_line_bullets))
+        res = self.net.send(self.net.id + ';;' + self.forming_player_inf() + ';;' + ';'.join(self.new_line_bullets))
         self.new_line_bullets = []
-        #pprint(res.split(';'))
         row_splited = res.split(';;')
         self.all_objects.empty()
-        for i in row_splited[0].split(';'):
-            self.add_net(i)
+        self.life = eval(row_splited[0])
+        #print(self.life)
+        if self.life and not self.player:
+            self.new_player()
+        if not self.life:
+            self.player = None
         for i in row_splited[1].split(';'):
+            self.add_net(i)
+        for i in row_splited[2].split(';'):
             self.add_bullet_net(i)
         now_list_peinted_line_bullet = {}
         for i in self.list_peinted_line_bullet.items():
             if i[1] + 200 > pygame.time.get_ticks():
                 now_list_peinted_line_bullet[i[0]] = i[1]
         self.list_peinted_line_bullet = now_list_peinted_line_bullet
-        self.add(self.player)
-        #print(res)
-        #self.all_objects.update(*args, **kwargs)
+        if self.player:
+            self.add(self.player)
+            self.position = self.player.update_player(self.position)
         self.all_line_bullet.update(*args, **kwargs)
-        #self.all_animations.update(*args, **kwargs)
         self.all_cursors.update(*args, **kwargs)
 
-    def calculation_relative_coordinates(self, *args, **kwargs):
-        self.all_objects.calculation_relative_coordinates(*args, **kwargs)
-        self.all_line_bullet.calculation_relative_coordinates(*args, **kwargs)
+    def calculation_relative_coordinates(self):
+        self.all_objects.calculation_relative_coordinates(self.position)
+        self.all_line_bullet.calculation_relative_coordinates(self.position)
 
     def action(self, *args, **kwargs):
-        act = self.player.action(*args, **kwargs)
-        if act:
-            self.new_line_bullets += [act]
-        #print(self.new_line_bullets)
-
-    def collide(self):
-        pass
-        #self.all_objects.collide()
-        #self.all_line_bullet.collide_objekts(self.all_objects)
+        if self.player:
+            act = self.player.action(*args, **kwargs)
+            if act:
+                self.new_line_bullets += [act]
+            #print(self.new_line_bullets)
 
     def draw(self, screen):
         self.all_objects.draw(screen)

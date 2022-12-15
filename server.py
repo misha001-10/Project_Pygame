@@ -7,6 +7,7 @@ import random
 import sys
 import S1_Server_Objekts
 import S2_Server_Groups
+import S3_Server_Functions
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -29,7 +30,77 @@ currentId = "0"
 pos = ["0:50,50", "1:100,100"]
 keys = {}
 line_bullet = S2_Server_Groups.Server_Line_Bullet_Group()
-all_objekts = pygame.sprite.Group()
+all_objekts = S2_Server_Groups.Server_Object_Group()
+
+
+#def threaded_client(conn):
+#    global currentId, pos, line_bullet
+#    player = None
+#    playr_life = True
+#    conn.send(str.encode(currentId))
+#    if currentId == '1':
+#        currentId = '2'
+#    currentId = "1"
+#    reply = ''
+#    while True:
+#        try:
+#            data = conn.recv(2048)
+#            reply = data.decode('utf-8')
+#            if not data:
+#                conn.send(str.encode("Goodbye"))
+#                print('ooooooooooooo\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\noooooooooooo')
+#                break
+#            else:
+#                #print('o')
+#                ##print("Recieved: " + reply)
+#                arr = reply.split(";;")
+#                reply_inf = arr[1].split(';')
+#                bullet_inf = arr[2].split(';')
+#                for i in reply_inf:
+#                    reply_inf_splited = i.split(':')
+#                    #print(reply_inf_splited)
+#                    if reply_inf_splited[0] in keys.keys():
+#                        for j in all_objekts:
+#                            if j.id == reply_inf_splited[0]:
+#                                j.receiving(reply_inf_splited[1].split('.'), reply_inf_splited[2])
+#                                break
+#                        else:
+#                            #print(reply_inf_splited[0])
+#                            if player is None:
+#                                player = reply_inf_splited[0]
+#                            else:
+#                                playr_life = False
+#                                print(playr_life)
+#                            if playr_life:
+#                                all_objekts.add(S1_Server_Objekts.Server_colide_objekt(reply_inf_splited[0], reply_inf_splited[1].split('.'), reply_inf_splited[2]))
+#                    if playr_life:
+#                        keys[reply_inf_splited[0]] = i
+#                for i in bullet_inf:
+#                    if i:
+#                        bullet_inf_splited = i.split(':')
+#                        line_bullet.add(S1_Server_Objekts.Server_line_bullet(*bullet_inf_splited))
+#                ##print(keys)
+#                ##print(arr[2])
+#                id = int(arr[0])
+#                pos[id] = reply
+#
+#                #if id == 0:
+#                #    nid = 1
+#                #if id == 1:
+#                #    nid = 0
+#
+#                #reply = pos[nid]
+#                reply = str(playr_life) + ';;' + ';'.join(keys.values()) + ';;' + line_bullet.str_transformation()
+#                print(reply)
+#                ##print("Sending: " + reply)
+#                ##print()
+#
+#            conn.sendall(str.encode(reply))
+#        except Exception:
+#            break
+#
+#    print("Connection Closed")
+#    conn.close()
 
 
 def threaded_client(conn):
@@ -38,6 +109,9 @@ def threaded_client(conn):
     if currentId == '1':
         currentId = '2'
     currentId = "1"
+
+    player = False
+    player_life = True
     reply = ''
     while True:
         try:
@@ -48,43 +122,40 @@ def threaded_client(conn):
                 print('ooooooooooooo\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\noooooooooooo')
                 break
             else:
-                #print('o')
-                ##print("Recieved: " + reply)
+
                 arr = reply.split(";;")
-                reply_inf = arr[1].split(';')
+                reply_inf = arr[1].split(':')
                 bullet_inf = arr[2].split(';')
-                for i in reply_inf:
-                    reply_inf_splited = i.split(':')
-                    #print(reply_inf_splited)
-                    if reply_inf_splited[0] in keys.keys():
-                        for j in all_objekts:
-                            if j.id == reply_inf_splited[0]:
-                                j.receiving(reply_inf_splited[1].split('.') + [64, 64], reply_inf_splited[2])
-                                break
+                #print(reply_inf)
+
+                player_life_in_list = S3_Server_Functions.check_id_in_group(all_objekts, reply_inf[0])
+
+                if player_life_in_list:
+                    player_life_in_list.receiving(reply_inf[1].split('.'), reply_inf[2])
+                else:
+                    if not player and player_life:
+                        if len(reply_inf) == 3:
+                            player = S1_Server_Objekts.Server_colide_objekt(reply_inf[0], reply_inf[1].split('.'), reply_inf[2])
+                            all_objekts.add(player)
+                    else:
+                        if reply_inf[0] == 'True':
+                            player_life = True
+                            player = False
                         else:
-                            all_objekts.add(S1_Server_Objekts.Server_colide_objekt(reply_inf_splited[0], reply_inf_splited[1].split('.') + [64, 64], reply_inf_splited[2]))
-                    keys[reply_inf_splited[0]] = i
+                            player_life = False
+                            player = False
+
                 for i in bullet_inf:
                     if i:
                         bullet_inf_splited = i.split(':')
                         line_bullet.add(S1_Server_Objekts.Server_line_bullet(*bullet_inf_splited))
-                ##print(keys)
-                ##print(arr[2])
-                id = int(arr[0])
-                pos[id] = reply
 
-                #if id == 0:
-                #    nid = 1
-                #if id == 1:
-                #    nid = 0
-
-                #reply = pos[nid]
-                reply = ';'.join(keys.values()) + ';;' + line_bullet.str_transformation()
-                ##print("Sending: " + reply)
-                ##print()
-
+            reply = str(bool(player_life)) + ';;' + ';'.join(keys.values()) + ';;' + line_bullet.str_transformation()
+            #print(reply)
             conn.sendall(str.encode(reply))
-        except Exception as e:
+
+        except Exception as a:
+            print(a)
             break
 
     print("Connection Closed")
@@ -108,18 +179,19 @@ def server_processing():
         for i in line_bullet:
             if i.time + 200 < pygame.time.get_ticks():
                 i.kill()
-        print(len(all_objekts), len(keys.keys()))
         line_bullet.collide_objekts(all_objekts)
         clock.tick(60)
         keys_now = {}
         for i in all_objekts:
             keys_now[i.id] = i.id + ':' + '.'.join([str(j) for j in i.cord]) + ':' + str(i.angle) + ':' + str(i.health)
+        all_objekts.collide()
         keys = keys_now
         all_objekts.update()
         #print()
         #clock.tick(60)
         #print(clock.get_fps())
         #net.send(net.id + ';;' + ';'.join(asteroid))
+
 
 th = Thread(target=server_processing, args=())
 th.start()

@@ -13,8 +13,8 @@ class Server_colide_objekt(pygame.sprite.Sprite):
         self.health = 150
 
     def receiving(self, rect, angle):
-        self.cord = [rect[0], rect[1]]
-        self.rects = [rect[2], rect[3]]
+        self.cord = [int(rect[0]), int(rect[1])]
+        self.rects = [int(rect[2]), int(rect[3])]
         self.width = self.rects[0]
         self.height = self.rects[1]
         self.angle = angle
