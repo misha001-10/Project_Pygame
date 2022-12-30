@@ -6,6 +6,7 @@ import M4_Functions
 import random
 
 
+# класс плеера
 class Player(M1_Objects.Object):
     def __init__(self, img, cord=[M6_Constants.W // 2, M6_Constants.H // 2], angle=0, health=1500, speed=[0, 0], angle_speed=0, max_angle_speed=4, speed_boost=0.1):
         self.id = '0201' + '.' + str(random.randint(9999999, 100000000))
@@ -13,6 +14,7 @@ class Player(M1_Objects.Object):
         self.speed_boost = speed_boost
         self.gan = Line_Bullet_Gan_Gatling(self, [50, 60, 600, 5], 15, 700, [3, 6])
 
+    # апдат плеера (его движение и поворот)
     def update_player(self, position):
         keystate = pygame.key.get_pressed()
         new_angle = None
@@ -46,6 +48,8 @@ class Player(M1_Objects.Object):
         if keystate[pygame.K_SPACE]:
             self.speed = [self.speed[0] + self.speed_boost * math.cos(self.angle * math.pi / 180),
                           self.speed[1] + self.speed_boost * math.sin(-self.angle * math.pi / 180)]
+        self.speed = [self.speed[0] - (self.speed[0] / 150),
+                      self.speed[1] - (self.speed[1] / 150)]
         if keystate[pygame.K_LSHIFT]:
             self.speed = [0, 0]
             #print(self.speed)
@@ -94,6 +98,7 @@ class Player(M1_Objects.Object):
         return self.gan.shooting()
 
 
+# основной класс пушек стриляющих моментальнымми снорядами и его наследники
 class Line_Bullet_Gan_Standard:
     def __init__(self, parent, damage, radius_of_defeat, accuracy):
         self.parent = parent

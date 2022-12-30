@@ -7,15 +7,10 @@ class Server_Object_Group(pygame.sprite.Group):
         for sprite_namber in range(len(self.sprites())):
             for sprite_namber1 in range(sprite_namber + 1, len(self.sprites())):
                 sprite, sprite1 = self.sprites()[sprite_namber], self.sprites()[sprite_namber1]
-                #hits = pygame.sprite.collide_mask(sprite, sprite1)
-                hits = 0
-                if sprite.cord[0] < sprite1.cord[0] + sprite1.rects[0] and sprite1.cord[0] < sprite.cord[0] + sprite.rects[0] and \
-                        sprite.cord[1] < sprite1.cord[1] + sprite1.rects[1] and sprite1.cord[1] < sprite.cord[1] + sprite.rects[1]:
-                    hits = 1
+                hits = sprite.rect.colliderect(sprite1)
                 if hits:
                     sprite.kill()
                     sprite1.kill()
-                    return False
 
 
 class Server_Line_Bullet_Group(pygame.sprite.Group):
@@ -23,7 +18,6 @@ class Server_Line_Bullet_Group(pygame.sprite.Group):
         for i in self.sprites():
             try:
                 if not i.life:
-                    #print(i.cord, i.end_cord)
                     i.life = 1
                     purpose = False
                     for j in group.sprites():
@@ -31,13 +25,10 @@ class Server_Line_Bullet_Group(pygame.sprite.Group):
                         if i.parent != j.id:
                             points = M4_Functions.collide_line_rect(i, j)
                             if any(points):
-                                #i.kill()
                                 len_line_point = {points[0]: False,
                                                   points[1]: False,
                                                   points[2]: False,
                                                   points[3]: False}
-                                #pprint(points)
-                                #pprint(len_line_point)
                                 if points[0]:
                                     len_line_point[points[0]] = (abs((points[0][0] - i.cord[0])) ** 2 + abs(
                                         (points[0][1] - i.cord[1])) ** 2) ** 0.5
@@ -55,16 +46,6 @@ class Server_Line_Bullet_Group(pygame.sprite.Group):
                                 purpose = j
                     if purpose:
                         purpose.health -= i.damage
-                                #print(i.end_cord)
-                                #if points[0]:
-                                #    self.parent.all_animations.add(M1_Objects.Animation(points[0]))
-                                #if points[1]:
-                                #    self.parent.all_animations.add(M1_Objects.Animation(points[1]))
-                                #if points[2]:
-                                #    # print(points[2])
-                                #    self.parent.all_animations.add(M1_Objects.Animation(points[2]))
-                                #if points[3]:
-                                #    self.parent.all_animations.add(M1_Objects.Animation(points[3]))
             except Exception:
                 pass
 

@@ -1,4 +1,3 @@
-import M1_Objects
 import pygame
 import random
 import math
@@ -13,6 +12,7 @@ class Server_colide_objekt(pygame.sprite.Sprite):
         self.health = 150
 
     def receiving(self, rect, angle):
+        self.rect = pygame.Rect(int(rect[0]), int(rect[1]), int(rect[2]), int(rect[3]))
         self.cord = [int(rect[0]), int(rect[1])]
         self.rects = [int(rect[2]), int(rect[3])]
         self.width = self.rects[0]
@@ -43,6 +43,12 @@ class Server_Objekt(Server_colide_objekt):
             self.angle = 0 + (self.angle - 360)
         self.cord[0] += self.speed[0]
         self.cord[1] += self.speed[1]
+
+
+class Player(Server_colide_objekt):
+    def __init__(self, id, rect, angle=0, health=1500):
+        super(Player, self).__init__(id, rect, angle)
+        self.health = health
 
 
 class Server_line_bullet(pygame.sprite.Sprite):

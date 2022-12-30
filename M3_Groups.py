@@ -40,14 +40,13 @@ class Large_Sprite_Group():
 
     def add_net(self, objekt):
         objekt_splited = objekt.split(':')
-        #print(float(objekt_splited[2]))
         if objekt_splited[0].split('.')[0] == '0201':
-            if self.player:
-                if objekt_splited[0].split('.')[1] == self.player.id:
-                    return
+            if self.player and objekt_splited[0].split('.')[1] == self.player.id.split('.')[1]:
+                return
+            else:
+                self.all_objects.add(M1_Objects.Object(M6_Constants.IMG['p_img'], [int(i) for i in objekt_splited[1].split('.')], angle=float(objekt_splited[2])))
         elif objekt_splited[0].split('.')[0] == '0101':
             self.all_objects.add(M1_Objects.Object(M6_Constants.IMG['astr_img'], [int(i) for i in objekt_splited[1].split('.')], angle=float(objekt_splited[2])))
-        #print([int(i) for i in objekt_splited[1].split('.')])
 
     def add_bullet_net(self, bullet):
         if bullet:
@@ -66,13 +65,11 @@ class Large_Sprite_Group():
                 return 'True'
 
     def update(self, *args, **kwargs):
-        #print(self.net.id + ';;' + self.forming_player_inf() + ';;' + ';'.join(self.new_line_bullets))
         res = self.net.send(self.net.id + ';;' + self.forming_player_inf() + ';;' + ';'.join(self.new_line_bullets))
         self.new_line_bullets = []
         row_splited = res.split(';;')
         self.all_objects.empty()
         self.life = eval(row_splited[0])
-        #print(self.life)
         if self.life and not self.player:
             self.new_player()
         if not self.life:
@@ -101,7 +98,6 @@ class Large_Sprite_Group():
             act = self.player.action(*args, **kwargs)
             if act:
                 self.new_line_bullets += [act]
-            #print(self.new_line_bullets)
 
     def draw(self, screen):
         self.all_objects.draw(screen)
