@@ -1,22 +1,25 @@
 import pygame
+import math
 import M1_Objects
 import M4_Functions
 import M2_Player
 import M6_Constants
-from M5_Network import Network
+import M7_Animations
 
 
 class Large_Sprite_Group():
-    def __init__(self):
+    def __init__(self, net):
         self.all_objects = Object_Sprite_Group(self)
         self.all_line_bullet = Line_Bullet_Group(self)
         self.list_peinted_line_bullet = {}
-        #self.all_animations = Animation_Group(self)
+        self.all_animations = Animation_Group(self)
         self.all_cursors = Cursor_Group(self)
+        self.cursor = M1_Objects.Cursor(M6_Constants.IMG['c_img'])
+        self.add(self.cursor)
         self.new_line_bullets = []
         self.life = True
         self.new_player()
-        self.net = Network()
+        self.net = net
 
     def new_player(self):
         self.position = [0, 0]
@@ -52,8 +55,13 @@ class Large_Sprite_Group():
         if bullet:
             bullet_splited = bullet.split(':')
             if bullet_splited[0] not in self.list_peinted_line_bullet.keys():
-                self.all_line_bullet.add(M1_Objects.Bullet_Line(bullet_splited[0], [float(i) for i in bullet_splited[1].split('..')], [float(i) for i in bullet_splited[2].split('..')]))
+                self.all_line_bullet.add(M1_Objects.Bullet_Line(bullet_splited[0], [float(i) for i in bullet_splited[2].split('..')], [float(i) for i in bullet_splited[3].split('..')]))
                 self.list_peinted_line_bullet[bullet_splited[0]] = pygame.time.get_ticks()
+
+                angle_inf = [float(i) for i in bullet_splited[2].split('..')] + [float(i) for i in bullet_splited[3].split('..')]
+                self.all_animations.add(M7_Animations.Animation_angle_connection(M6_Constants.ANIMATIONS['03.02.001'], bullet_splited[0].split('..')[1], 180 + math.atan2(angle_inf[0] - angle_inf[2], angle_inf[1] - angle_inf[3]) * 180 / math.pi + 180))
+                if bullet_splited[1] == '1':
+                    self.cursor.hit = 0
 
     def forming_player_inf(self):
         if self.player:
@@ -88,10 +96,12 @@ class Large_Sprite_Group():
             self.position = self.player.update_player(self.position)
         self.all_line_bullet.update(*args, **kwargs)
         self.all_cursors.update(*args, **kwargs)
+        self.all_animations.update(self.all_objects)
 
     def calculation_relative_coordinates(self):
         self.all_objects.calculation_relative_coordinates(self.position)
         self.all_line_bullet.calculation_relative_coordinates(self.position)
+        self.all_animations.calculation_relative_coordinates(self.position)
 
     def action(self, *args, **kwargs):
         if self.player:
@@ -102,8 +112,27 @@ class Large_Sprite_Group():
     def draw(self, screen):
         self.all_objects.draw(screen)
         self.all_line_bullet.draw(screen)
-        #self.all_animations.draw(screen)
+        self.all_animations.draw(screen)
         self.all_cursors.draw(screen)
+
+
+class Start_Sprite_Group():
+    def __init__(self):
+        self.all_cursors = Cursor_Group(self)
+        self.all_buttons = pygame.sprite.Group()
+        self.cursor = M1_Objects.Cursor(M6_Constants.IMG['c_img'])
+        self.all_cursors.add(self.cursor)
+
+    def add(self, sprite):
+        if type(sprite) == M1_Objects.Button:
+            self.all_buttons.add(sprite)
+
+    def update(self, *args, **kwargs):
+        self.all_cursors.update(*args, **kwargs)
+
+    def draw(self, screen):
+        self.all_cursors.draw(screen)
+        self.all_buttons.draw(screen)
 
 
 class Object_Sprite_Group(pygame.sprite.Group):
@@ -194,9 +223,9 @@ class Animation_Group(pygame.sprite.Group):
         super(Animation_Group, self).__init__()
         self.parent = parent
 
-    def draw(self, surface: pygame.Surface) -> None:
-        for i in self.sprites():
-            i.draw(surface)
+    def calculation_relative_coordinates(self, *args, **kwargs):
+        for sprite in self.sprites():
+            sprite.calculation_relative_coordinates(*args, **kwargs)
 
 
 class Cursor_Group(pygame.sprite.Group):

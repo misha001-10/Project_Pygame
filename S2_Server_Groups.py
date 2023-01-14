@@ -46,6 +46,7 @@ class Server_Line_Bullet_Group(pygame.sprite.Group):
                                 purpose = j
                     if purpose:
                         purpose.health -= i.damage
+                        i.strike = '1'
             except Exception:
                 pass
 
@@ -53,5 +54,5 @@ class Server_Line_Bullet_Group(pygame.sprite.Group):
         preparation_list = []
         for i in self.sprites():
             if i.life:
-                preparation_list += [i.id + ':' + '..'.join([str(j) for j in i.cord]) + ':' + '..'.join([str(j) for j in i.end_cord])]
+                preparation_list += [i.id + ':' + i.strike + ':' + '..'.join([str(j) for j in i.cord]) + ':' + '..'.join([str(j) for j in i.end_cord])]
         return ';'.join(preparation_list)

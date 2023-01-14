@@ -1,6 +1,4 @@
 import pygame
-import math
-import random
 
 
 class Object(pygame.sprite.Sprite):
@@ -78,40 +76,52 @@ class Bullet_Line(pygame.sprite.Sprite):
         #b1 = self.cord[1] - (k1 * self.cord[0])
 
 
-class Animation(pygame.sprite.Sprite):
-    def __init__(self, cord):
-        super(Animation, self).__init__()
-        self.cord = cord
-        self.rect_cord = cord
-
-    def update(self, position):
-        self.rect_cord = self.cord[0] + position[0], self.cord[1] + position[1]
-
-    def draw(self, surface):
-        #print(self.rect_cord)
-        pygame.draw.circle(surface, (255, 255, 255), self.rect_cord, 5)
-
-
 class Cursor(pygame.sprite.Sprite):
     def __init__(self, img):
         super(Cursor, self).__init__()
         self.type = 'cursor'
         self.img = img
-        self.image = self.img[0]
+        self.image = self.img[0][0]
         self.image.set_colorkey((255, 255, 255))
         self.rect = self.image.get_rect()
         self.button_event = [0, 0, 0]
+        self.hit = 5
 
     def update(self):
+        #if pygame.mouse.get_focused():
+        #    self.rect.center = pygame.mouse.get_pos()
+        #    if self.button_event != pygame.mouse.get_pressed():
+        #        if pygame.mouse.get_pressed()[0]:
+        #            self.image = self.img[1][poz]
+        #            self.image.set_colorkey((255, 255, 255))
+        #        else:
+        #            self.image = self.img[0][poz]
+        #            self.image.set_colorkey((255, 255, 255))
+        #    self.button_event = pygame.mouse.get_pressed()
+        #else:
+        #    self.rect.center = (-20, -20)
+
         if pygame.mouse.get_focused():
             self.rect.center = pygame.mouse.get_pos()
-            if self.button_event != pygame.mouse.get_pressed():
-                if pygame.mouse.get_pressed()[0]:
-                    self.image = self.img[1]
-                    self.image.set_colorkey((255, 255, 255))
-                else:
-                    self.image = self.img[0]
-                    self.image.set_colorkey((255, 255, 255))
-            self.button_event = pygame.mouse.get_pressed()
+            if self.hit <= 3:
+                poz = 1
+            else:
+                poz = 0
+            self.hit += 1
+            if pygame.mouse.get_pressed()[0]:
+                self.image = self.img[1][poz]
+                self.image.set_colorkey((255, 255, 255))
+            else:
+                self.image = self.img[0][poz]
+                self.image.set_colorkey((255, 255, 255))
         else:
             self.rect.center = (-20, -20)
+
+
+class Button(pygame.sprite.Sprite):
+    def __init__(self, img, cord):
+        super(Button, self).__init__()
+        self.image = pygame.transform.scale(img, (480, 192))
+        self.rect = self.image.get_rect()
+        self.rect.x = 1440
+        self.rect.y = 888

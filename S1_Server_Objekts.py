@@ -72,3 +72,4 @@ class Server_line_bullet(pygame.sprite.Sprite):
                          self.cord[1] + radius_of_defeat * math.sin(-self.angle * math.pi / 180)]
         self.parent = parent
         self.damage = damage
+        self.strike = '0'

@@ -11,7 +11,7 @@ import S3_Server_Functions
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-server = '192.168.0.17'
+server = '192.168.0.14'
 port = 5555
 
 server_ip = socket.gethostbyname(server)
