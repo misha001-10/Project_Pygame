@@ -111,6 +111,7 @@ def server_processing():
     #            '001' + '.' + str(random.randint(9999999, 100000000)) + ':' + '120.120' + ':' + '1500',
     #            '001' + '.' + str(random.randint(9999999, 100000000)) + ':' + '520.360' + ':' + '1500']
     #print(asteroid)
+    t = pygame.time.get_ticks()
     while True:
         #print(line_bullet)
         for i in line_bullet:
@@ -123,6 +124,9 @@ def server_processing():
             keys_now[i.id] = i.id + ':' + '.'.join([str(j) for j in i.cord]) + ':' + str(i.angle) + ':' + str(i.health)
         all_objekts.collide()
         keys = keys_now
+        #if pygame.time.get_ticks() - t > 100:
+        #    t = pygame.time.get_ticks()
+        #    line_bullet.add(S1_Server_Objekts.Server_line_bullet(*f'l.{str(random.randint(9999999, 100000000))}..l:l:{500.500}:{100}:{0}:{500}:{0}'.split(':')))
         all_objekts.update()
         #print()
         #clock.tick(60)

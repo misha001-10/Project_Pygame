@@ -2,8 +2,10 @@ import pygame
 
 
 class Object(pygame.sprite.Sprite):
-    def __init__(self, img: pygame.Surface, cord, angle=0, health=1500, speed=[0, 0], angle_speed=0,
+    def __init__(self, img: pygame.Surface, id, anim_radius, cord, angle=0, health=1500, speed=[0, 0], angle_speed=0,
                  max_angle_speed=0):
+        self.id = id
+        self.anim_radius = anim_radius
         pygame.sprite.Sprite.__init__(self)
         self.img = img
         self.angle = angle
@@ -125,3 +127,21 @@ class Button(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = 1440
         self.rect.y = 888
+
+
+class Background():
+    def __init__(self, img, cord):
+        self.image = img
+        self.cord = list(cord)
+        self.rect = self.image.get_rect()
+
+    def calculation_relative_coordinates(self, position):
+        self.rect.center = position[0] + self.cord[0], position[1] + self.cord[1]
+        if self.rect.x > 1920:
+            self.cord[0] -= 1920 * 2
+        if self.rect.x + 1920 < 0:
+            self.cord[0] += 1920 * 2
+        if self.rect.y > 1080:
+            self.cord[1] -= 1080 * 2
+        if self.rect.y + 1080 < 0:
+            self.cord[1] += 1080 * 2

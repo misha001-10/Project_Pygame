@@ -35,6 +35,9 @@ def Game_body(net):
         all_sprits.calculation_relative_coordinates()
 
         M6_Constants.SCREEN.fill((0, 0, 35))
+        #for i in range(4):
+        #    M6_Constants.SCREEN.blit(M6_Constants.BACKGROUND[i], M6_Constants.BACKGROUND_RECT[i])
+
 
         all_sprits.draw(M6_Constants.SCREEN)
         pygame.display.flip()

@@ -29,7 +29,7 @@ class Animation_angle(Animation):
             self.img += [pygame.transform.rotate(i, angle)]
         super(Animation_angle, self).__init__(self.img, cord)
 
-    def update(self):
+    def update(self, *args, **kwargs):
         try:
             self.anim_poz += 1
             self.image = self.img[int(self.anim_poz / 2)]
@@ -59,8 +59,8 @@ class Animation_angle_connection(Animation):
         try:
             self.anim_poz += 1
             self.image = self.img[int(self.anim_poz / 2)]
-            cord = [perent.cord[0] + perent.width * math.cos(perent.angle * math.pi / 180),
-                    perent.cord[1] + perent.width * math.sin(-perent.angle * math.pi / 180)]
+            cord = [perent.cord[0] + perent.anim_radius * math.cos(perent.angle * math.pi / 180),
+                    perent.cord[1] + perent.anim_radius * math.sin(-perent.angle * math.pi / 180)]
             self.cord = cord
         except Exception:
             self.kill()

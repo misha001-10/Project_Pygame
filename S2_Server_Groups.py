@@ -47,6 +47,7 @@ class Server_Line_Bullet_Group(pygame.sprite.Group):
                     if purpose:
                         purpose.health -= i.damage
                         i.strike = '1'
+                        i.id += '..' + purpose.id
             except Exception:
                 pass
 

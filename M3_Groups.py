@@ -20,11 +20,12 @@ class Large_Sprite_Group():
         self.life = True
         self.new_player()
         self.net = net
+        self.backgrounds = [M1_Objects.Background(i, j) for i, j in zip(M6_Constants.BACKGROUND, ((0, 0), (1920, 0), (0, 1080), (1920, 1080)))]
 
     def new_player(self):
         self.position = [0, 0]
         self.respawn_flag = False
-        self.player = M2_Player.Player(M6_Constants.IMG['p_img'], [M6_Constants.W // 2, M6_Constants.H // 2])
+        self.player = M2_Player.player_forming([M6_Constants.W // 2, M6_Constants.H // 2])
         self.add(self.player)
         self.life = True
 
@@ -47,9 +48,9 @@ class Large_Sprite_Group():
             if self.player and objekt_splited[0].split('.')[1] == self.player.id.split('.')[1]:
                 return
             else:
-                self.all_objects.add(M1_Objects.Object(M6_Constants.IMG['p_img'], [int(i) for i in objekt_splited[1].split('.')], angle=float(objekt_splited[2])))
+                self.all_objects.add(M1_Objects.Object(M6_Constants.IMG['p_img'], objekt_splited[0], 15, [int(i) for i in objekt_splited[1].split('.')], angle=float(objekt_splited[2])))
         elif objekt_splited[0].split('.')[0] == '0101':
-            self.all_objects.add(M1_Objects.Object(M6_Constants.IMG['astr_img'], [int(i) for i in objekt_splited[1].split('.')], angle=float(objekt_splited[2])))
+            self.all_objects.add(M1_Objects.Object(M6_Constants.IMG['astr_img'], objekt_splited[0], 15, [int(i) for i in objekt_splited[1].split('.')], angle=float(objekt_splited[2])))
 
     def add_bullet_net(self, bullet):
         if bullet:
@@ -58,9 +59,32 @@ class Large_Sprite_Group():
                 self.all_line_bullet.add(M1_Objects.Bullet_Line(bullet_splited[0], [float(i) for i in bullet_splited[2].split('..')], [float(i) for i in bullet_splited[3].split('..')]))
                 self.list_peinted_line_bullet[bullet_splited[0]] = pygame.time.get_ticks()
 
+                if self.player:
+                    x_sr = [float(i) for i in bullet_splited[2].split('..')][0] - self.player.cord[0]
+                    y_sr = [float(i) for i in bullet_splited[2].split('..')][1] - self.player.cord[1]
+                    new_angle = 180 + math.atan2(x_sr, y_sr) * 180 / math.pi + 90
+                    #cos = math.cos(new_angle)
+                    #sin = math.sin(-new_angle)
+                    #print(new_angle, cos)
+                    lenn = math.sqrt(x_sr ** 2 + y_sr ** 2)
+                    #if cos > 0:
+                    #    volume = (0, 1)
+                    #else:
+                    #    volume = (1, 0)
+                    volume = (0, 0)
+                    if lenn < 3000:
+                        volume = 1 - lenn / 3000, 1 - lenn / 3000
+                    if lenn < 80:
+                        volume = (1, 1)
+                    a = M6_Constants.SND[0].play()
+                    if a:
+                        a.set_volume(*volume)
+
                 angle_inf = [float(i) for i in bullet_splited[2].split('..')] + [float(i) for i in bullet_splited[3].split('..')]
+                #print(bullet_splited)
                 self.all_animations.add(M7_Animations.Animation_angle_connection(M6_Constants.ANIMATIONS['03.02.001'], bullet_splited[0].split('..')[1], 180 + math.atan2(angle_inf[0] - angle_inf[2], angle_inf[1] - angle_inf[3]) * 180 / math.pi + 180))
-                if bullet_splited[1] == '1':
+                if bullet_splited[1] != '0':
+                    self.all_animations.add(M7_Animations.Animation_angle(M6_Constants.ANIMATIONS['03.02.001'], [float(i) for i in bullet_splited[3].split('..')], math.atan2(angle_inf[0] - angle_inf[2], angle_inf[1] - angle_inf[3]) * 180 / math.pi + 180))
                     self.cursor.hit = 0
 
     def forming_player_inf(self):
@@ -102,6 +126,12 @@ class Large_Sprite_Group():
         self.all_objects.calculation_relative_coordinates(self.position)
         self.all_line_bullet.calculation_relative_coordinates(self.position)
         self.all_animations.calculation_relative_coordinates(self.position)
+        #M6_Constants.BACKGROUND_RECT[0].center = self.position[0] + 0, self.position[1] + 0
+        #M6_Constants.BACKGROUND_RECT[1].center = self.position[0] + 1920, self.position[1] + 0
+        #M6_Constants.BACKGROUND_RECT[2].center = self.position[0] + 0, self.position[1] + 1080
+        #M6_Constants.BACKGROUND_RECT[3].center = self.position[0] + 1920, self.position[1] + 1080
+        for i in self.backgrounds:
+            i.calculation_relative_coordinates(self.position)
 
     def action(self, *args, **kwargs):
         if self.player:
@@ -110,6 +140,8 @@ class Large_Sprite_Group():
                 self.new_line_bullets += [act]
 
     def draw(self, screen):
+        for i in self.backgrounds:
+            screen.blit(i.image, i.rect)
         self.all_objects.draw(screen)
         self.all_line_bullet.draw(screen)
         self.all_animations.draw(screen)

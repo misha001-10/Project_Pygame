@@ -4,7 +4,8 @@ import M4_Functions
 
 # основной класс пушек стриляющих моментальнымми снорядами и его наследники
 class Line_Bullet_Gan_Standard:
-    def __init__(self, parent, damage, radius_of_defeat, accuracy):
+    def __init__(self, parent, id, damage, radius_of_defeat, accuracy):
+        self.id = id
         self.parent = parent
         self.damage = damage
         self.range = radius_of_defeat
@@ -21,8 +22,8 @@ class Line_Bullet_Gan_Standard:
 
 
 class Line_Bullet_Gan_Autocannon(Line_Bullet_Gan_Standard):
-    def __init__(self, parent, rate_of_fire, damage, radius_of_defeat, accuracy):
-        super(Line_Bullet_Gan_Autocannon, self).__init__(parent, damage, radius_of_defeat, accuracy)
+    def __init__(self, parent, id, rate_of_fire, damage, radius_of_defeat, accuracy):
+        super(Line_Bullet_Gan_Autocannon, self).__init__(parent, id, damage, radius_of_defeat, accuracy)
         self.rate_of_fire = rate_of_fire
         self.time = 0
 
@@ -34,8 +35,8 @@ class Line_Bullet_Gan_Autocannon(Line_Bullet_Gan_Standard):
 
 
 class Line_Bullet_Gan_Automat(Line_Bullet_Gan_Standard):
-    def __init__(self, parent, rate_of_fire, queue, damage, radius_of_defeat, accuracy):
-        super(Line_Bullet_Gan_Automat, self).__init__(parent, damage, radius_of_defeat, accuracy)
+    def __init__(self, parent, id, rate_of_fire, queue, damage, radius_of_defeat, accuracy):
+        super(Line_Bullet_Gan_Automat, self).__init__(parent, id, damage, radius_of_defeat, accuracy)
         self.rate_of_fire = rate_of_fire
         self.queue = queue
         self.time = 0
@@ -58,8 +59,8 @@ class Line_Bullet_Gan_Automat(Line_Bullet_Gan_Standard):
 
 
 class Line_Bullet_Gan_Gatling(Line_Bullet_Gan_Standard):
-    def __init__(self, parent, rate_of_fire, damage, radius_of_defeat, accuracy_list):
-        super(Line_Bullet_Gan_Gatling, self).__init__(parent, damage, radius_of_defeat, accuracy_list[0])
+    def __init__(self, parent, id, rate_of_fire, damage, radius_of_defeat, accuracy_list):
+        super(Line_Bullet_Gan_Gatling, self).__init__(parent, id, damage, radius_of_defeat, accuracy_list[0])
         self.accuracy_list = accuracy_list
         self.rate_of_fire = rate_of_fire
         self.time = 0
@@ -86,10 +87,11 @@ class Line_Bullet_Gan_Gatling(Line_Bullet_Gan_Standard):
 def weapon_forming(parent, string):
     string_splited = string.split(';')
     id = string_splited[0].split('.')
+    data_inf = [int(i) if not '..' in i else [int(j) for j in i.split('..')] for i in string_splited[1].split(':')]
     if id[0] == '02':
         if id[1] == '01':
-            return Line_Bullet_Gan_Autocannon(parent, *[int(i) if not '..' in i else [int(j) for j in i.split('..')] for i in string_splited[1].split(':')])
+            return Line_Bullet_Gan_Autocannon(parent, string_splited[0], *data_inf)
         elif id[1] == '02':
-            return Line_Bullet_Gan_Automat(parent, *[int(i) if not '..' in i else [int(j) for j in i.split('..')] for i in string_splited[1].split(':')])
+            return Line_Bullet_Gan_Automat(parent, string_splited[0], *data_inf)
         elif id[1] == '03':
-            return Line_Bullet_Gan_Gatling(parent, *[int(i) if not '..' in i else [int(j) for j in i.split('..')] for i in string_splited[1].split(':')])
+            return Line_Bullet_Gan_Gatling(parent, string_splited[0], *data_inf)

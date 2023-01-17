@@ -67,4 +67,4 @@ def line_bullet_shoot(perent, accuracy, range, damage):
     cord = [perent.cord[0] + 16 * math.cos(perent.angle * math.pi / 180),
              perent.cord[1] + 16 * math.sin(-perent.angle * math.pi / 180)]
     cord = '.'.join([str(int(i)) for i in cord])
-    return f'{str(random.randint(9999999, 100000000))}..{perent.id}:{perent.id}:{cord}:{perent.angle}:{accuracy}:{range}:{damage}'
+    return f'{perent.gan.id}.{str(random.randint(9999999, 100000000))}..{perent.id}:{perent.id}:{cord}:{perent.angle}:{accuracy}:{range}:{damage}'

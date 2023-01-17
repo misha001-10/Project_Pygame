@@ -8,11 +8,11 @@ import random
 
 # класс плеера
 class Player(M1_Objects.Object):
-    def __init__(self, img, cord=[M6_Constants.W // 2, M6_Constants.H // 2], angle=0, health=1500, speed=[0, 0], angle_speed=0, max_angle_speed=4, speed_boost=0.1):
-        self.id = '0201' + '.' + str(random.randint(9999999, 100000000))
-        super(Player, self).__init__(img, cord, angle, health, speed, angle_speed, max_angle_speed)
+    def __init__(self, img, anim_radius, weapon, cord=[M6_Constants.W // 2, M6_Constants.H // 2], angle=0, health=1500, speed=[0, 0], angle_speed=0, max_angle_speed=4, speed_boost=0.1):
+        id = '0201' + '.' + str(random.randint(9999999, 100000000))
+        super(Player, self).__init__(img, id, anim_radius, cord, angle, health, speed, angle_speed, max_angle_speed)
         self.speed_boost = speed_boost
-        self.gan = M8_Weapons.weapon_forming(self, M6_Constants.WEAPON[2])
+        self.gan = M8_Weapons.weapon_forming(self, weapon)
 
     # апдат плеера (его движение и поворот)
     def update_player(self, position):
@@ -96,3 +96,11 @@ class Player(M1_Objects.Object):
 
     def action(self, *args, **kwargs):
         return self.gan.shooting()
+
+
+def player_forming(cord):
+    string = M6_Constants.SAVE_SHIP[0].split(';')
+    print(string)
+    id = string[0].split('.')
+    data_inf = [float(i) if not '..' in i else [float(j) for j in i.split('..')] for i in string[2].split(':')]
+    return Player(img=M6_Constants.IMG[string[0]], anim_radius=int(string[1].split(':')[1]), weapon=M6_Constants.SAVE_SHIP[1], cord=cord, health=data_inf[0], max_angle_speed=data_inf[1], speed_boost=data_inf[2])
