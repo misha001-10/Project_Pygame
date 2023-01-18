@@ -1,4 +1,5 @@
 import pygame
+import M6_Constants
 
 
 class Object(pygame.sprite.Sprite):
@@ -86,6 +87,7 @@ class Cursor(pygame.sprite.Sprite):
         self.image = self.img[0][0]
         self.image.set_colorkey((255, 255, 255))
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         self.button_event = [0, 0, 0]
         self.hit = 5
 
@@ -113,9 +115,11 @@ class Cursor(pygame.sprite.Sprite):
             if pygame.mouse.get_pressed()[0]:
                 self.image = self.img[1][poz]
                 self.image.set_colorkey((255, 255, 255))
+                self.mask = pygame.mask.from_surface(self.image)
             else:
                 self.image = self.img[0][poz]
                 self.image.set_colorkey((255, 255, 255))
+                self.mask = pygame.mask.from_surface(self.image)
         else:
             self.rect.center = (-20, -20)
 
@@ -125,8 +129,22 @@ class Button(pygame.sprite.Sprite):
         super(Button, self).__init__()
         self.image = pygame.transform.scale(img, (480, 192))
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect.x = 1440
         self.rect.y = 888
+        self.doun = 0
+
+    def update_navedenie(self, integ):
+        self.doun = integ
+        if integ == 1:
+            self.image = M6_Constants.BUTTON_IMG['button_corner1']
+            self.transform()
+        else:
+            self.image = M6_Constants.BUTTON_IMG['button_corner']
+            self.transform()
+
+    def transform(self):
+        self.image = pygame.transform.scale(self.image, (480, 192))
 
 
 class Background():

@@ -1,9 +1,12 @@
 import pygame
+import random
 import M4_Functions
+import S1_Server_Objekts
 
 
 class Server_Object_Group(pygame.sprite.Group):
     def collide(self):
+        anim = []
         for sprite_namber in range(len(self.sprites())):
             for sprite_namber1 in range(sprite_namber + 1, len(self.sprites())):
                 sprite, sprite1 = self.sprites()[sprite_namber], self.sprites()[sprite_namber1]
@@ -11,6 +14,9 @@ class Server_Object_Group(pygame.sprite.Group):
                 if hits:
                     sprite.kill()
                     sprite1.kill()
+                    anim += [S1_Server_Objekts.Animation(str(random.randint(9999999, 100000000)), sprite.cord),
+                             S1_Server_Objekts.Animation(str(random.randint(9999999, 100000000)), sprite1.cord)]
+        return anim
 
     def update(self):
         a = []
@@ -72,5 +78,5 @@ class Server_Line_Anim_Group(pygame.sprite.Group):
         preparation_list = []
         for i in self.sprites():
             preparation_list += [i.id + ':' + '..'.join([str(j) for j in i.cord])]
-        print(';'.join(preparation_list))
+        #print(';'.join(preparation_list))
         return ';'.join(preparation_list)

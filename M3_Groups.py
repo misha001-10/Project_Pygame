@@ -45,13 +45,13 @@ class Large_Sprite_Group():
 
     def add_net(self, objekt):
         objekt_splited = objekt.split(':')
-        if objekt_splited[0].split('.')[0] == '0201':
+        if objekt_splited[0].split('.')[0] == '0101':
+            self.all_objects.add(M1_Objects.Object(M6_Constants.IMG['astr_img'], objekt_splited[0], 15, [int(i) for i in objekt_splited[1].split('.')], angle=float(objekt_splited[2])))
+        else:
             if self.player and objekt_splited[0] == self.player.id:
                 return
-            else:
-                self.all_objects.add(M1_Objects.Object(M6_Constants.IMG['p_img'], objekt_splited[0], 15, [int(i) for i in objekt_splited[1].split('.')], angle=float(objekt_splited[2])))
-        elif objekt_splited[0].split('.')[0] == '0101':
-            self.all_objects.add(M1_Objects.Object(M6_Constants.IMG['astr_img'], objekt_splited[0], 15, [int(i) for i in objekt_splited[1].split('.')], angle=float(objekt_splited[2])))
+            elif objekt:
+                self.all_objects.add(M1_Objects.Object(M6_Constants.IMG['.'.join(objekt_splited[0].split('.')[:-1])], objekt_splited[0], 15, [int(i) for i in objekt_splited[1].split('.')], angle=float(objekt_splited[2])))
 
     def add_bullet_net(self, bullet):
         if bullet:
@@ -98,13 +98,14 @@ class Large_Sprite_Group():
                 return 'True'
 
     def update(self, *args, **kwargs):
+        #try:
         res = self.net.send(self.net.id + ';;' + self.forming_player_inf() + ';;' + ';'.join(self.new_line_bullets))
         self.new_line_bullets = []
         row_splited = res.split(';;')
         self.all_objects.empty()
         self.life = eval(row_splited[0])
         if row_splited[-1]:
-            print(row_splited[-1])
+            print(row_splited)
         if self.life and not self.player:
             self.new_player()
         if not self.life:
@@ -127,6 +128,9 @@ class Large_Sprite_Group():
         self.all_line_bullet.update(*args, **kwargs)
         self.all_cursors.update(*args, **kwargs)
         self.all_animations.update(self.all_objects)
+        #except Exception as a:
+        #    print(a)
+        #    print('xaxaxa')
 
     def calculation_relative_coordinates(self):
         self.all_objects.calculation_relative_coordinates(self.position)
@@ -166,11 +170,15 @@ class Start_Sprite_Group():
             self.all_buttons.add(sprite)
 
     def update(self, *args, **kwargs):
+        for i in self.all_buttons:
+            i.update_navedenie(0)
+            if pygame.sprite.collide_mask(i, self.cursor):
+                i.update_navedenie(1)
         self.all_cursors.update(*args, **kwargs)
 
     def draw(self, screen):
-        self.all_cursors.draw(screen)
         self.all_buttons.draw(screen)
+        self.all_cursors.draw(screen)
 
 
 class Object_Sprite_Group(pygame.sprite.Group):

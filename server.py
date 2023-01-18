@@ -60,6 +60,7 @@ def threaded_client(conn):
                     if player.health <= 0:
                         player.kill()
                         player_life = False
+                        boom_pap_inf.add(S1_Server_Objekts.Animation(str(random.randint(9999999, 100000000)), player.cord))
 
                 arr = reply.split(";;")
                 reply_inf = arr[1].split(':')
@@ -106,6 +107,7 @@ def server_processing():
     all_objekts.add(S1_Server_Objekts.Server_Objekt([10, 10, 64, 64], health=1500, angle_speed=random.randint(-200, 200) / 100))
     all_objekts.add(S1_Server_Objekts.Server_Objekt([120, 120, 64, 64], health=1500, angle_speed=random.randint(-200, 200) / 100))
     all_objekts.add(S1_Server_Objekts.Server_Objekt([520, 520, 64, 64], health=1500, angle_speed=random.randint(-200, 200) / 100))
+    #all_objekts.add(S1_Server_Objekts.Player('01.01.003.101', [515, 220, 64, 64], 100))
 
     #asteroid = ['001' + '.' + str(random.randint(9999999, 100000000)) + ':' + '10.10' + ':' + '1500',
     #            '001' + '.' + str(random.randint(9999999, 100000000)) + ':' + '120.120' + ':' + '1500',
@@ -125,7 +127,9 @@ def server_processing():
         keys_now = {}
         for i in all_objekts:
             keys_now[i.id] = i.id + ':' + '.'.join([str(j) for j in i.cord]) + ':' + str(i.angle) + ':' + str(i.health)
-        all_objekts.collide()
+        aa = all_objekts.collide()
+        if aa:
+            boom_pap_inf.add(aa)
         keys = keys_now
         #if pygame.time.get_ticks() - t > 100:
         #    t = pygame.time.get_ticks()

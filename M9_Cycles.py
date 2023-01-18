@@ -4,6 +4,7 @@ import M1_Objects
 import M3_Groups
 from M5_Network import Network
 import M6_Constants
+import M10_PyQt
 
 
 def terminate():
@@ -58,8 +59,13 @@ def Start_window():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
-            if event.type == pygame.KEYUP:
-                return Network()
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                for i in all_sprits.all_buttons:
+                    if i.doun == 1:
+                        ex = M10_PyQt.Example()
+                        ex.show()
+                        #sys.exit(app.exec())
+                #return Network()
 
         # обновление спрайтов и прорисовка
         all_sprits.update()

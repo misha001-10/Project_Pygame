@@ -47,7 +47,7 @@ class Server_Objekt(Server_colide_objekt):
 
 
 class Player(Server_colide_objekt):
-    def __init__(self, id, rect, angle=0, health=1500):
+    def __init__(self, id, rect, angle=0, health=150):
         super(Player, self).__init__(id, rect, angle)
         self.health = health
 

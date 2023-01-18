@@ -24,7 +24,8 @@ IMG = {'astr_img': pygame.image.load(path.join(IMG_DIR, 'asteroid_64x64_1.png'))
                  (pygame.image.load(path.join(IMG_DIR, 'cursor_left.png')), pygame.image.load(path.join(IMG_DIR, 'cursor_left_hit.png'))))}
 
 BUTTON_IMG_DIR = path.join(IMG_DIR, 'buttons')
-BUTTON_IMG = {'button_corner': pygame.image.load(path.join(BUTTON_IMG_DIR, 'button_corner.png'))}
+BUTTON_IMG = {'button_corner': pygame.image.load(path.join(BUTTON_IMG_DIR, 'button_corner1.png')),
+              'button_corner1': pygame.image.load(path.join(BUTTON_IMG_DIR, 'button_corner2.png'))}
 
 BACKGROUND = (pygame.image.load(path.join(IMG_DIR, 'sky_layer_first1.png')),
               pygame.image.load(path.join(IMG_DIR, 'sky_layer_first1.png')),
