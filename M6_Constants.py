@@ -19,8 +19,7 @@ IMG_DIR = path.join(path.dirname(__file__), 'img')
 SND_DIR = path.join(path.dirname(__file__), 'snd')
 DATE_DIR = path.join(path.dirname(__file__), 'date')
 
-IMG = {'p_img': pygame.image.load(path.join(IMG_DIR, 'plain1.png')),
-       'astr_img': pygame.image.load(path.join(IMG_DIR, 'asteroid_64x64_1.png')),
+IMG = {'astr_img': pygame.image.load(path.join(IMG_DIR, 'asteroid_64x64_1.png')),
        'c_img': ((pygame.image.load(path.join(IMG_DIR, 'cursor_norm.png')), pygame.image.load(path.join(IMG_DIR, 'cursor_norm_hit.png'))),
                  (pygame.image.load(path.join(IMG_DIR, 'cursor_left.png')), pygame.image.load(path.join(IMG_DIR, 'cursor_left_hit.png'))))}
 

@@ -12,6 +12,14 @@ class Server_Object_Group(pygame.sprite.Group):
                     sprite.kill()
                     sprite1.kill()
 
+    def update(self):
+        a = []
+        for i in self.sprites():
+            aa = i.update()
+            if aa:
+                a += [aa]
+        return a
+
 
 class Server_Line_Bullet_Group(pygame.sprite.Group):
     def collide_objekts(self, group):
@@ -41,7 +49,7 @@ class Server_Line_Bullet_Group(pygame.sprite.Group):
                                 if points[3]:
                                     len_line_point[points[3]] = (abs((points[3][0] - i.cord[0])) ** 2 + abs(
                                         (points[3][1] - i.cord[1])) ** 2) ** 0.5
-                                print('1\n\n111\n\n1')
+                                #print('1\n\n111\n\n1')
                                 i.end_cord = min([i for i in len_line_point.keys() if i], key=lambda x: len_line_point[x])
                                 purpose = j
                     if purpose:
@@ -56,4 +64,13 @@ class Server_Line_Bullet_Group(pygame.sprite.Group):
         for i in self.sprites():
             if i.life:
                 preparation_list += [i.id + ':' + i.strike + ':' + '..'.join([str(j) for j in i.cord]) + ':' + '..'.join([str(j) for j in i.end_cord])]
+        return ';'.join(preparation_list)
+
+
+class Server_Line_Anim_Group(pygame.sprite.Group):
+    def str_transformation(self):
+        preparation_list = []
+        for i in self.sprites():
+            preparation_list += [i.id + ':' + '..'.join([str(j) for j in i.cord])]
+        print(';'.join(preparation_list))
         return ';'.join(preparation_list)

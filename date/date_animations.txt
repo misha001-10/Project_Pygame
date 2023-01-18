@@ -1,1 +1,2 @@
 03.02.001;line_bullet_shot_1:5
+03.02.002;big_boom:5

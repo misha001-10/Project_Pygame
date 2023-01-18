@@ -11,7 +11,7 @@ import S3_Server_Functions
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-server = '192.168.0.14'
+server = '192.168.0.17'
 port = 5555
 
 server_ip = socket.gethostbyname(server)
@@ -31,6 +31,7 @@ pos = ["0:50,50", "1:100,100"]
 keys = {}
 line_bullet = S2_Server_Groups.Server_Line_Bullet_Group()
 all_objekts = S2_Server_Groups.Server_Object_Group()
+boom_pap_inf = S2_Server_Groups.Server_Line_Anim_Group()
 
 
 def threaded_client(conn):
@@ -87,8 +88,7 @@ def threaded_client(conn):
                         bullet_inf_splited = i.split(':')
                         line_bullet.add(S1_Server_Objekts.Server_line_bullet(*bullet_inf_splited))
 
-            reply = str(bool(player_life)) + ';;' + ';'.join(keys.values()) + ';;' + line_bullet.str_transformation()
-            #print(reply)
+            reply = str(bool(player_life)) + ';;' + ';'.join(keys.values()) + ';;' + line_bullet.str_transformation() + ';;' + boom_pap_inf.str_transformation()
             conn.sendall(str.encode(reply))
 
         except Exception as a:
@@ -100,7 +100,7 @@ def threaded_client(conn):
 
 
 def server_processing():
-    global pos, all_objekts, line_bullet, keys
+    global pos, all_objekts, line_bullet, keys, boom_pap_inf
     clock = pygame.time.Clock()
     #net = Network()
     all_objekts.add(S1_Server_Objekts.Server_Objekt([10, 10, 64, 64], health=1500, angle_speed=random.randint(-200, 200) / 100))
@@ -117,6 +117,9 @@ def server_processing():
         for i in line_bullet:
             if i.time + 200 < pygame.time.get_ticks():
                 i.kill()
+        for i in boom_pap_inf:
+            if i.time + 200 < pygame.time.get_ticks():
+                i.kill()
         line_bullet.collide_objekts(all_objekts)
         clock.tick(60)
         keys_now = {}
@@ -127,7 +130,9 @@ def server_processing():
         #if pygame.time.get_ticks() - t > 100:
         #    t = pygame.time.get_ticks()
         #    line_bullet.add(S1_Server_Objekts.Server_line_bullet(*f'l.{str(random.randint(9999999, 100000000))}..l:l:{500.500}:{100}:{0}:{500}:{0}'.split(':')))
-        all_objekts.update()
+        aa = all_objekts.update()
+        if aa:
+            boom_pap_inf.add(aa)
         #print()
         #clock.tick(60)
         #print(clock.get_fps())

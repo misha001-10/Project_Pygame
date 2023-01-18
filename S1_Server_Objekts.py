@@ -35,6 +35,7 @@ class Server_Objekt(Server_colide_objekt):
     def update(self):
         if self.health <= 0:
             self.kill()
+            return Animation(str(random.randint(9999999, 100000000)), self.cord)
         #print(self.health, end=' ')
         self.angle += self.angle_speed
         if self.angle < 0:
@@ -73,3 +74,11 @@ class Server_line_bullet(pygame.sprite.Sprite):
         self.parent = parent
         self.damage = damage
         self.strike = '0'
+
+
+class Animation(pygame.sprite.Sprite):
+    def __init__(self, id, cord):
+        super(Animation, self).__init__()
+        self.time = pygame.time.get_ticks()
+        self.id = id
+        self.cord = cord

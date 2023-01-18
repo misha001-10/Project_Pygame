@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 import M1_Objects
 import M4_Functions
 import M2_Player
@@ -45,7 +46,7 @@ class Large_Sprite_Group():
     def add_net(self, objekt):
         objekt_splited = objekt.split(':')
         if objekt_splited[0].split('.')[0] == '0201':
-            if self.player and objekt_splited[0].split('.')[1] == self.player.id.split('.')[1]:
+            if self.player and objekt_splited[0] == self.player.id:
                 return
             else:
                 self.all_objects.add(M1_Objects.Object(M6_Constants.IMG['p_img'], objekt_splited[0], 15, [int(i) for i in objekt_splited[1].split('.')], angle=float(objekt_splited[2])))
@@ -102,6 +103,8 @@ class Large_Sprite_Group():
         row_splited = res.split(';;')
         self.all_objects.empty()
         self.life = eval(row_splited[0])
+        if row_splited[-1]:
+            print(row_splited[-1])
         if self.life and not self.player:
             self.new_player()
         if not self.life:
@@ -110,6 +113,9 @@ class Large_Sprite_Group():
             self.add_net(i)
         for i in row_splited[2].split(';'):
             self.add_bullet_net(i)
+        for i in row_splited[3].split(';'):
+            if i:
+                self.all_animations.add(M7_Animations.Animation_angle(M6_Constants.ANIMATIONS['03.02.002'], [int(j) for j in i.split(':')[1].split('..')], random.randint(0, 360)))
         now_list_peinted_line_bullet = {}
         for i in self.list_peinted_line_bullet.items():
             if i[1] + 200 > pygame.time.get_ticks():
